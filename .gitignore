@@ -1,8 +1,11 @@
 # PyCharm
 .idea/
 
-# venv
+# VirtualEnv
 venv/
 
-# python
+# Python
 __pycache__/
+
+# Project
+*.so

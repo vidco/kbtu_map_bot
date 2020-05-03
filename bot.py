@@ -1,37 +1,81 @@
-import ctypes
-from time import time
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, ConversationHandler
 
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
+from back import Graph
+from utils.timer import timing_decorator
 
-TOKEN = '1108472031:AAHdZGhDLe5IqCXfpqeR4ibA2nN04lz4r64'
-
-lib = ctypes.cdll.LoadLibrary('./back/qwe.so')
+TOKEN = '1108472031:AAHdZGhDLe5IqCXfpqeR4ibA2nN04lz4r64'        # Bot token
+G = Graph()                                                     # Graph of KBTU with all nodes (locations)
+FIRST, SECOND = range(2)                                        # States of Conversation for path finding
+NUMBER_REGEX = '^[0-9]+$'                                       # Regex for numbers (node numbers)
 
 
 def start(update, context):
-    update.message.reply_text('Hi!')
+    update.message.reply_text('Hello! I can find fastest path to any place in KBTU')
 
 
-def echo(update, context):
-    _start = time()
-    nums = update.message.text.split('+')
-    a, b = int(nums[0]), int(nums[1])
-    update.message.reply_text(str(lib.SampleAddInt(a, b)))
-    update.message.reply_text(str(a+b))
-    print(time() - _start)
+def path_from(update, context):
+    """
+    Ask for initial location
+    """
+    update.message.reply_text('Where are you?')
+
+    return FIRST
+
+
+def path_to(update, context):
+    """
+    Ask for final location
+    """
+    context.user_data['from'] = int(update.message.text)
+
+    update.message.reply_text('Where you want to go?')
+
+    return SECOND
+
+
+@timing_decorator
+def path(update, context):
+    """
+    Calculate and return path between two locations
+    """
+    node_from = context.user_data['from']
+    node_to = int(update.message.text)
+
+    minimal_path = G.mindist(node_from, node_to)
+    update.message.reply_text(' -> '.join(str(node) for node in minimal_path))
+
+    return ConversationHandler.END
+
+
+def cancel(update, context):
+    """
+    Cancel Conversation for path finding and deletes 'from' location if exists
+    """
+    if 'from' in context.user_data:
+        del context.user_data['from']
+
+    update.message.reply_text('Canceled')
 
 
 def main():
     updater = Updater(TOKEN, use_context=True)
 
-    dp = updater.dispatcher
+    # Register /start command
+    updater.dispatcher.add_handler(CommandHandler("start", start))
 
-    dp.add_handler(CommandHandler("start", start))
-
-    dp.add_handler(MessageHandler(Filters.text, echo))
+    # Register Conversation Handler with /path and /cancel commands
+    updater.dispatcher.add_handler(
+        ConversationHandler(
+            entry_points=[CommandHandler('path', path_from)],
+            states={
+                FIRST: [MessageHandler(Filters.regex(NUMBER_REGEX), path_to)],
+                SECOND: [MessageHandler(Filters.regex(NUMBER_REGEX), path)]
+            },
+            fallbacks=[CommandHandler('cancel', cancel)]
+        )
+    )
 
     updater.start_polling()
-
     updater.idle()
 
 
