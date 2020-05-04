@@ -31,8 +31,8 @@ struct Graph {
 		g[21] = {20};
 	}
 	const std::vector<int> mindist(int a, int b) {
-		std::vector<int> dist(10 + 1, 0);
-		std::vector<int> p(10 + 1);
+		std::vector<int> dist(25, 0);
+		std::vector<int> p(25, 0);
 		std::vector<int> ans;
 		std::queue<int> q;
 
@@ -74,7 +74,7 @@ struct Graph {
 		return ans;
 	}
 
-	std::vector<int> g[11];
+	std::vector<int> g[25];
 };
 
 PYBIND11_MODULE(graph, m) {
