@@ -6,8 +6,8 @@
 
 namespace py = pybind11;
 
-struct Graph {
-	Graph() {
+struct Path {
+	Path() {
 		g[1] = {2};
 		g[2] = {1, 3};
 		g[3] = {2, 4};
@@ -77,10 +77,8 @@ struct Graph {
 	std::vector<int> g[25];
 };
 
-PYBIND11_MODULE(graph, m) {
-    // m.def("add", &add, "A function which adds two numbers");
-
-    py::class_<Graph>(m, "Graph")
+PYBIND11_MODULE(path, m) {
+    py::class_<Path>(m, "Path")
     	.def(py::init<>())
-    	.def("mindist", &Graph::mindist);
+    	.def("minimum_path", &Path::mindist);
 }
