@@ -1,14 +1,15 @@
-from PIL import Image, ImageDraw2
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, ConversationHandler
 
 from back import Graph
-from utils.timer import timing_decorator
-from utils.coord import COORD
+from nodes import Nodes
+from utils import timing_decorator, draw
 
 TOKEN = '1108472031:AAHdZGhDLe5IqCXfpqeR4ibA2nN04lz4r64'        # Bot token
-G = Graph()                                                     # Graph of KBTU with all nodes (locations)
+GRAPH = Graph()                                                 # Graph for calculating minimal path
+NODES = Nodes()                                                 # Graph with node information
 FIRST, SECOND = range(2)                                        # States of Conversation for path finding
-NUMBER_REGEX = '^[0-9]+$'                                       # Regex for numbers (node numbers)
+
+BOT = Updater(TOKEN, use_context=True)
 
 
 def start(update, context):
@@ -26,42 +27,55 @@ def path_from(update, context):
 
 def path_to(update, context):
     """
-    Ask for final location
+    Check if node exists, if not return to FIRST
+    Then ask for final location
     """
-    context.user_data['from'] = int(update.message.text)
+    node_id = NODES.check_by_name(update.message.text)
 
-    update.message.reply_text('Where you want to go?')
+    if node_id:
+        context.user_data['from'] = node_id
+        update.message.reply_text('Where you want to go?')
 
-    return SECOND
+        return SECOND
+
+    else:
+        update.message.reply_text('Not found. Try again')
+
+        return FIRST
 
 
 @timing_decorator
 def path(update, context):
     """
+    Check if node exists, if not return to SECOND
     Calculate and return path between two locations
     """
-    node_from = context.user_data['from']
-    node_to = int(update.message.text)
+    id_to = NODES.check_by_name(update.message.text)
 
-    minimal_path = G.mindist(node_from, node_to)
+    if not id_to:
+        update.message.reply_text('Not found. Try again')
 
-    im = Image.open("images/qwe.png")
-    d = ImageDraw2.Draw(im)
+        return SECOND
 
-    pen = ImageDraw2.Pen(color="red")
+    minimal_path = GRAPH.mindist(context.user_data.get('from'), id_to)
+
+    print(minimal_path)
+
     nodes = []
 
-    for node in minimal_path:
-        obj = COORD[node]
-        x = obj['x']
-        y = obj['y']
+    for node_id in minimal_path:
+        data = NODES.get(node_id)
+        x = data.get('x')
+        y = data.get('y')
 
-        nodes.append((x, y))
+        if x or y:
+            nodes.append((x, y))
 
-    d.line(nodes, pen)
-    im.save("drawn_grid.png")
+    # Draw on template image nodes
+    photo = draw(nodes, 'third')
 
-    update.message.reply_text(' -> '.join(str(COORD[node]['number']) for node in minimal_path))
+    update.message.reply_text(NODES.path(minimal_path))
+    BOT.bot.send_photo(chat_id=update.message.chat_id, photo=photo)
 
     return ConversationHandler.END
 
@@ -77,25 +91,23 @@ def cancel(update, context):
 
 
 def main():
-    updater = Updater(TOKEN, use_context=True)
-
     # Register /start command
-    updater.dispatcher.add_handler(CommandHandler("start", start))
+    BOT.dispatcher.add_handler(CommandHandler("start", start))
 
     # Register Conversation Handler with /path and /cancel commands
-    updater.dispatcher.add_handler(
+    BOT.dispatcher.add_handler(
         ConversationHandler(
             entry_points=[CommandHandler('path', path_from)],
             states={
-                FIRST: [MessageHandler(Filters.regex(NUMBER_REGEX), path_to)],
-                SECOND: [MessageHandler(Filters.regex(NUMBER_REGEX), path)]
+                FIRST: [MessageHandler(Filters.text, path_to)],
+                SECOND: [MessageHandler(Filters.text, path)]
             },
             fallbacks=[CommandHandler('cancel', cancel)]
         )
     )
 
-    updater.start_polling()
-    updater.idle()
+    BOT.start_polling()
+    BOT.idle()
 
 
 if __name__ == '__main__':
