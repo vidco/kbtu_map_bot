@@ -1,7 +1,9 @@
+from PIL import Image, ImageDraw2
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, ConversationHandler
 
 from back import Graph
 from utils.timer import timing_decorator
+from utils.coord import COORD
 
 TOKEN = '1108472031:AAHdZGhDLe5IqCXfpqeR4ibA2nN04lz4r64'        # Bot token
 G = Graph()                                                     # Graph of KBTU with all nodes (locations)
@@ -42,7 +44,24 @@ def path(update, context):
     node_to = int(update.message.text)
 
     minimal_path = G.mindist(node_from, node_to)
-    update.message.reply_text(' -> '.join(str(node) for node in minimal_path))
+
+    im = Image.open("images/qwe.png")
+    d = ImageDraw2.Draw(im)
+
+    pen = ImageDraw2.Pen(color="red")
+    nodes = []
+
+    for node in minimal_path:
+        obj = COORD[node]
+        x = obj['x']
+        y = obj['y']
+
+        nodes.append((x, y))
+
+    d.line(nodes, pen)
+    im.save("drawn_grid.png")
+
+    update.message.reply_text(' -> '.join(str(COORD[node]['number']) for node in minimal_path))
 
     return ConversationHandler.END
 
