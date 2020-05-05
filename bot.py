@@ -58,14 +58,17 @@ def path(update, context):
     minimal_path = PATH.minimum_path(context.user_data.get('from'), id_to)
 
     print(minimal_path)
+    print(GRAPH.get_delimited_path(minimal_path))
 
-    path_coordinates = GRAPH.get_path_coordinates(minimal_path)
+    path_coordinates = GRAPH.get_delimited_path(minimal_path)
 
     # Draw on template image nodes
-    photo = draw(path_coordinates, 'third')
+    images = draw(path_coordinates)
 
     update.message.reply_text(GRAPH.path(minimal_path))
-    UPDATER.bot.send_photo(chat_id=update.message.chat_id, photo=photo)
+
+    for image in images:
+        UPDATER.bot.send_photo(chat_id=update.message.chat_id, photo=image)
 
     return ConversationHandler.END
 
