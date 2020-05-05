@@ -3,16 +3,21 @@ from io import BytesIO
 from PIL import Image, ImageDraw2
 
 
-def draw(nodes, floor):
-    image = Image.open(f'images/{floor}.png')
+def draw(delimited_path):
 
     pen = ImageDraw2.Pen(color="red")
+    bytes_list = []
 
-    drawer = ImageDraw2.Draw(image)
-    drawer.line(nodes, pen)
+    for floor, path in delimited_path.items():
+        image = Image.open(f'images/{floor}.png')
+        drawer = ImageDraw2.Draw(image)
 
-    _bytes = BytesIO()
-    image.save(_bytes, 'PNG')
-    _bytes.seek(0)
+        for subpath in path:
+            drawer.line(subpath, pen)
 
-    return _bytes
+        _bytes = BytesIO()
+        image.save(_bytes, 'PNG')
+        _bytes.seek(0)
+        bytes_list.append(_bytes)
+
+    return bytes_list

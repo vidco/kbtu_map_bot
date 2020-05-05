@@ -19,18 +19,35 @@ class Graph:
     def get(self, node_id):
         return self.nodes.get(node_id)
 
-    def get_path_coordinates(self, path):
-        nodes = []
+    def get_coords(self, node_id):
+        node = self.get(node_id)
+        return node.get('x'), node.get('y')
 
-        for node_id in path:
-            data = self.get(node_id)
-            x = data.get('x')
-            y = data.get('y')
+    def get_floor(self, node_id):
+        return self.get(node_id).get('floor')
 
-            if x or y:
-                nodes.append((x, y))
+    def get_delimited_path(self, path):
+        d = {}
+        current_path = [self.get_coords(path[0])]
 
-        return nodes
+        for i in range(1, len(path)):
+            if self.get_floor(path[i - 1]) == self.get_floor(path[i]):
+                current_path.append(self.get_coords(path[i]))
+            else:
+                if len(current_path) > 1:
+                    floor = self.get_floor(path[i - 1])
+                    if floor not in d:
+                        d[floor] = []
+                    d[floor].append(current_path)
+                current_path = [self.get_coords(path[i])]
+
+        if len(current_path) > 1:
+            floor = self.get_floor(path[-1])
+            if floor not in d:
+                d[floor] = []
+            d[floor].append(current_path)
+
+        return d
 
     def path(self, path):
         return ' -> '.join(str(self.get(node).get('number')) for node in path)
