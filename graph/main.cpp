@@ -1,7 +1,9 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
-
+#include <algorithm>
 #include <vector>
+#include <sstream>
+#include <fstream>
 
 namespace py = pybind11;
 
@@ -21,15 +23,18 @@ struct Node {
 		this->floor = floor;
 		this->adjacent = adjacent;
 	}
+	int getId() {
+	    return this->id;
+	}
 };
 
 struct Graph {
 	std::vector<Node> g;
 
-	Graph(string path) {
-		ifstream fin;
+	Graph(std::string path) {
+		std::ifstream fin;
 		fin.open(path);
-		std::vector<string> row;
+		std::vector<std::string> row;
 		std::vector<int> adjacent;
 		std::string temp, line, word;
 
@@ -37,7 +42,7 @@ struct Graph {
 			row.clear();
 			adjacent.clear();
 			fin >> line;
-			stringstream s(line);
+			std::stringstream s(line);
 			while (getline(s, word, ',')) {
 				row.push_back(word);
 			}
@@ -46,14 +51,12 @@ struct Graph {
 			int x = stoi(row[2]);
 			int y = stoi(row[3]);
 			std::string floor = row[4];
-			stringstream adj(row[5]);
+			std::stringstream adj(row[5]);
 			std::string nei;
 			while (getline(adj, nei, '-')) {
 				adjacent.push_back(stoi(nei));
 			}
 			Node *node = new Node(id, location, x, y, floor, adjacent);
-			//cout << id << " " << location << " " << x << " " << y << " " << floor << endl;
-			//Node node{id, location, x, y, floor};
 			g.push_back(*node);
 		}
 	}
@@ -61,33 +64,14 @@ struct Graph {
 	Node getNode(int id) {
 		return g[id];	
 	}
-
-	// void print() {
-	// 	for (int i = 0; i < int(g.size()); i++) {
-	// 		Node node = g[i];
-	// 		cout << node.id << " " << node.location << " " << node.floor << endl;
-	// 		cout << "Neighbors: ";
-	// 		for (int j = 0; j < int(node.adjacent.size()); j++) {
-	// 			cout << node.adjacent[j] << " ";
-	// 		}
-	// 		cout << endl;
-	// 	}
-	// }
-
 };
 
-PYBIND11_MODULE(path2, m) {
+PYBIND11_MODULE(main, m) {
     py::class_<Node>(m, "Node")
-    	.def(py::init<int, std::string, int, int, std::string, std::vector<int> >());
+    	.def(py::init<int, std::string, int, int, std::string, std::vector<int> >())
+    	.def("get_id", &Node::getId);
 
     py::class_<Graph>(m, "Graph")
     	.def(py::init<std::string>())
     	.def("get_node", &Graph::getNode);
 }
-
-// int main() {
-// 	string path = "nodes.csv";
-// 	Graph *graph = new Graph(path);
-// 	graph->print();
-// 	cout << graph->g.size() << endl;
-// }
