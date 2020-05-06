@@ -1,10 +1,10 @@
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, ConversationHandler
+from telegram.ext.dispatcher import run_async
 
 from graph import Graph, Path
 from utils import timing_decorator, draw
 
 TOKEN = '1108472031:AAHdZGhDLe5IqCXfpqeR4ibA2nN04lz4r64'        # Bot token
-UPDATER = Updater(TOKEN, use_context=True)                      # Main Bot object
 PATH = Path()                                                   # Graph for calculating minimal path
 GRAPH = Graph()                                                 # Graph with node information
 FIRST, SECOND = range(2)                                        # States of Conversation for path finding
@@ -58,17 +58,17 @@ def path(update, context):
     minimal_path = PATH.minimum_path(context.user_data.get('from'), id_to)
 
     print(minimal_path)
-    print(GRAPH.get_delimited_path(minimal_path))
 
     path_coordinates = GRAPH.get_delimited_path(minimal_path)
+
+    print(path_coordinates)
 
     # Draw on template image nodes
     images = draw(path_coordinates)
 
     update.message.reply_text(GRAPH.path(minimal_path))
 
-    for image in images:
-        UPDATER.bot.send_photo(chat_id=update.message.chat_id, photo=image)
+    _send_photo_async(update, context.bot, images)
 
     return ConversationHandler.END
 
@@ -83,12 +83,21 @@ def cancel(update, context):
     update.message.reply_text('Canceled')
 
 
+@run_async
+def _send_photo_async(update, bot, images):
+    for image in images:
+        bot.send_photo(chat_id=update.message.chat_id, photo=image)
+
+
 def main():
+    # Main Bot object
+    updater = Updater(TOKEN, use_context=True)
+
     # Register /start command
-    UPDATER.dispatcher.add_handler(CommandHandler("start", start))
+    updater.dispatcher.add_handler(CommandHandler("start", start))
 
     # Register Conversation Handler with /path and /cancel commands
-    UPDATER.dispatcher.add_handler(
+    updater.dispatcher.add_handler(
         ConversationHandler(
             entry_points=[CommandHandler('path', path_from)],
             states={
@@ -99,8 +108,8 @@ def main():
         )
     )
 
-    UPDATER.start_polling()
-    UPDATER.idle()
+    updater.start_polling()
+    updater.idle()
 
 
 if __name__ == '__main__':
