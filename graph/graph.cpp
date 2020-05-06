@@ -2,6 +2,7 @@
 #include <pybind11/stl.h>
 #include <algorithm>
 #include <vector>
+#include <queue>
 #include <sstream>
 #include <fstream>
 
@@ -33,14 +34,14 @@ struct Node {
 	}
 
 	std::pair<int, int> getCoordinates() {
-		return make_pair(this->x, this->y);
+		return std::make_pair(this->x, this->y);
 	}
 
 	std::string getFloor() {
 		return this->floor;
 	}
 
-	std::string getAdjacents() {
+	std::vector<int> getAdjacents() {
 		return this->adjacents;
 	}
 };
@@ -84,16 +85,16 @@ struct Graph {
 				return g[i];
 			}
 		}
-		return NULL;
+		return Node{-1, "", -1, -1, "", std::vector<int>(0)};
 	}
 
-	int checkByName(string location) {
+	int checkByName(std::string location) {
 		for (int i = 0; i < int(g.size()); i++) {
 			if (g[i].getLocation() == location) {
 				return g[i].getId();
 			}
 		}
-		return NULL;
+		return -1;
 	}
 
 	std::vector<int> getMinDist(int a, int b) {
@@ -105,8 +106,8 @@ struct Graph {
 			int nodeId = q.front();
 			q.pop();
 			Node node = getNode(nodeId);
-			std::vector<int> adjacents = node->getAdjacents();
-			for (int i = 0; i < adjacents.size(); i++) {
+			std::vector<int> adjacents = node.getAdjacents();
+			for (int i = 0; i < (int) adjacents.size(); i++) {
 				int toId = adjacents[i];
 				if (dist[toId] == 0) {
 					dist[toId] = dist[nodeId] + 1;
@@ -129,17 +130,17 @@ struct Graph {
 		std::map<std::string, std::vector<std::vector<std::pair<int, int> > > > pathOnFloor;
 		std::vector<std::pair<int, int> > currentPath;
 		std::string currentFloor;
-		currentPath.push_back(getNode(path[0])->getCoordinates());
-		currentFloor = getNode(path[0])->getFloor();
+		currentPath.push_back(getNode(path[0]).getCoordinates());
+		currentFloor = getNode(path[0]).getFloor();
 		for (int i = 1; i < int(path.size()); i++) {
-			if (getNode(path[i])->getFloor() != currentFloor) {
+			if (getNode(path[i]).getFloor() != currentFloor) {
 				if (currentPath.size() > 1) {
 					pathOnFloor[currentFloor].push_back(currentPath);
 				}
 				currentPath.clear();
-				currentFloor = getNode(path[i])->getFloor();
+				currentFloor = getNode(path[i]).getFloor();
 			}
-			currentPath.push_back(getNode(path[i])->getCoordinates());
+			currentPath.push_back(getNode(path[i]).getCoordinates());
 		}
 		if (currentPath.size() > 1) {
 			pathOnFloor[currentFloor].push_back(currentPath);
@@ -148,7 +149,7 @@ struct Graph {
 	}
 };
 
-PYBIND11_MODULE(main, m) {
+PYBIND11_MODULE(graph, m) {
     py::class_<Node>(m, "Node")
     	.def(py::init<int, std::string, int, int, std::string, std::vector<int> >())
     	.def("get_id", &Node::getId)

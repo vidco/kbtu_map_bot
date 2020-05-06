@@ -1,3 +1,4 @@
+# After transfer to csv - delete
 NODES = {
     41: {
         'number': '415',
