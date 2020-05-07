@@ -93,7 +93,7 @@ struct Graph {
 				return g[i];
 			}
 		}
-		return Node{-1, "", -1, -1, "", std::vector<int>(0)};
+		return Node{-1, "", -1, -1, -1, std::vector<int>(0)};
 	}
 
 	int checkByName(std::string location) {
@@ -139,15 +139,15 @@ struct Graph {
 		int yd = to.second - from.second;
 		if (!xd) {
 			if (yd > 0) {
-				return Direction.DOWN;
+				return DOWN;
 			} else {
-				return Direction.UP;
+				return UP;
 			}
 		} else {
 			if (xd > 0) {
-				return Direction.RIGHT;
+				return RIGHT;
 			} else {
-				return Direction.LEFT;
+				return LEFT;
 			}
 		}
 	}
@@ -165,7 +165,7 @@ struct Graph {
 	std::string pathDescription(std::vector<int> path) {
 		std::string textPath = "";
 		for (int i = 0; i < int(path.size()); i++) {
-			string location = getNode(path[i]).getLocation();
+			std::string location = getNode(path[i]).getLocation();
 			if (location == "cross") {
 				std::pair<int, int> prevCoords = getNode(path[i - 1]).getCoordinates();
 				std::pair<int, int> curCoords = getNode(path[i]).getCoordinates();
@@ -187,16 +187,18 @@ struct Graph {
 				} else {
 					textPath += "go downstairs to the ";
 				}
-				textPath += to_string(nextFloor);
+				textPath += std::to_string(nextFloor);
 				textPath += " floor";
 			} else {
 				textPath += location;
 			}
 
-			if (i != int(path.size())) {
+			if (i != int(path.size()) - 1) {
 				textPath += " -> ";
 			}
 		}
+
+		return textPath;
 	}
 
 	std::map<int, std::vector<std::vector<std::pair<int, int> > > > getPathOnFloor(std::vector<int> path) {

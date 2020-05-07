@@ -65,7 +65,7 @@ def path(update, context):
     # Draw on template image nodes
     images = draw(path_coordinates)
 
-    update.message.reply_text(' -> '.join(GRAPH.get_node(node_id).get_location() for node_id in minimal_path))
+    update.message.reply_text(GRAPH.path_description(minimal_path))
 
     _send_photo_async(update, context.bot, images)
 
