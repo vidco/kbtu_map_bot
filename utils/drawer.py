@@ -1,19 +1,20 @@
 from io import BytesIO
 
-from PIL import Image, ImageDraw2
+from PIL import Image
+from PIL.ImageDraw2 import Pen, Draw
 
 
 def draw(delimited_path):
 
-    pen = ImageDraw2.Pen(color="red")
+    pen = Pen(color="red", width=3)
     bytes_list = []
 
-    for floor, path in delimited_path.items():
+    for floor, paths in delimited_path.items():
         image = Image.open(f'images/{floor}.png')
-        drawer = ImageDraw2.Draw(image)
+        drawer = Draw(image)
 
-        for subpath in path:
-            drawer.line(subpath, pen)
+        for path in paths:
+            drawer.line(path, pen)
 
         _bytes = BytesIO()
         image.save(_bytes, 'PNG')
