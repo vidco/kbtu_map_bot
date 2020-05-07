@@ -207,6 +207,17 @@ struct Graph {
 				textPath += cross;
 			} else if (location == "ladder") {
 				int prevFloor = getNode(path[i]).getFloor();
+				if (getNode(path[i + 1]).getLocation() != "ladder") {
+				    std::pair<int, int> prevCoords = getNode(path[i - 1]).getCoordinates();
+                    std::pair<int, int> curCoords = getNode(path[i]).getCoordinates();
+                    std::pair<int, int> nextCoords = getNode(path[i + 1]).getCoordinates();
+                    Direction first = getDirection(prevCoords, curCoords);
+                    Direction second = getDirection(curCoords, nextCoords);
+                    std::string cross = getCross(first, second);
+                    textPath += cross;
+                    textPath += " -> ";
+                    continue;
+				}
 				while (location == "ladder") {
 					i++;
 					location = getNode(path[i]).getLocation();
