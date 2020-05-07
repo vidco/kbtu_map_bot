@@ -1,4 +1,4 @@
-from main import Graph, Node
+from graph import Graph, Node
 from p_graph import Graph2, Node2
 import time
 import timeit
@@ -12,9 +12,11 @@ print(graph.get_node(2).get_id())
 # start = time.time()
 # graph = Graph2('nodes.csv')
 # print(graph.get_node(2).get_id())
-QWE = graph.get_min_dist(10, 5)
+QWE = graph.get_min_dist(21, 22)
 print(QWE)
-print(graph.get_path_on_floor(QWE))
+PATH = graph.get_path_on_floor(QWE)
+print(PATH)
+print(graph.path_description(QWE))
 p = time.time() - start
 print(p)
 

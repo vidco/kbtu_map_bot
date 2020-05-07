@@ -7,6 +7,7 @@ from utils import timing_decorator, draw
 TOKEN = '1108472031:AAHdZGhDLe5IqCXfpqeR4ibA2nN04lz4r64'        # Bot token
 GRAPH = Graph('graph/nodes.csv')                                # Graph with node information
 FIRST, SECOND = range(2)                                        # States of Conversation for path finding
+SIDE_DELTA = 10
 
 
 def start(update, context):
@@ -58,14 +59,14 @@ def path(update, context):
 
     print(minimal_path)
 
-    path_coordinates = GRAPH.get_path_on_floor(minimal_path)
+    path_coordinates = GRAPH.get_path_on_floor(minimal_path, SIDE_DELTA)
 
     print(path_coordinates)
 
     # Draw on template image nodes
     images = draw(path_coordinates)
 
-    update.message.reply_text(' -> '.join(GRAPH.get_node(node_id).get_location() for node_id in minimal_path))
+    update.message.reply_text(GRAPH.path_description(minimal_path))
 
     _send_photo_async(update, context.bot, images)
 
