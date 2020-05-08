@@ -193,11 +193,19 @@ struct Graph {
 		}
 	} 
 
+	std::string getStairsDirection(int prevFloor, int nextFloor) {
+		if (prevFloor > nextFloor) {
+			return "go downstairs to the ";
+		} else {
+			return "go upstairs to the ";
+		}
+	}
+
 	std::string pathDescription(std::vector<int> path) {
 		std::string textPath = "";
 		for (int i = 0; i < int(path.size()); i++) {
 			std::string location = getNode(path[i]).getLocation();
-			if (location == "cross") {
+			if (location == "cross" or (location == "ladder" and getNode(path[i + 1]).getLocation() != "ladder")) {
 				std::pair<int, int> prevCoords = getNode(path[i - 1]).getCoordinates();
 				std::pair<int, int> curCoords = getNode(path[i]).getCoordinates();
 				std::pair<int, int> nextCoords = getNode(path[i + 1]).getCoordinates();
@@ -207,28 +215,13 @@ struct Graph {
 				textPath += cross;
 			} else if (location == "ladder") {
 				int prevFloor = getNode(path[i]).getFloor();
-				if (getNode(path[i + 1]).getLocation() != "ladder") {
-				    std::pair<int, int> prevCoords = getNode(path[i - 1]).getCoordinates();
-                    std::pair<int, int> curCoords = getNode(path[i]).getCoordinates();
-                    std::pair<int, int> nextCoords = getNode(path[i + 1]).getCoordinates();
-                    Direction first = getDirection(prevCoords, curCoords);
-                    Direction second = getDirection(curCoords, nextCoords);
-                    std::string cross = getCross(first, second);
-                    textPath += cross;
-                    textPath += " -> ";
-                    continue;
-				}
 				while (location == "ladder") {
 					i++;
 					location = getNode(path[i]).getLocation();
 				}
 				i--;
 				int nextFloor = getNode(path[i]).getFloor();
-				if (nextFloor > prevFloor) {
-					textPath += "go upstairs to the ";
-				} else {
-					textPath += "go downstairs to the ";
-				}
+				textPath += getStairsDirection(prevFloor, nextFloor);
 				textPath += std::to_string(nextFloor);
 				textPath += " floor";
 
