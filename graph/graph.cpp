@@ -235,19 +235,52 @@ struct Graph {
 		return std::make_pair(dist, ancestors);
 	}
 
-	std::vector<int> getMinDist(int start, int end) {
-		std::pair<std::vector<int>, std::vector<int> > BFSFromStart = BFS(start);
-		std::vector<int> ancestors = BFSFromStart.second;
+	std::vector<int> restorePath(std::vector<int> ancestors, int start, int end) {
 		std::vector<int> path;
 
 		while (end != start) {
 			path.push_back(end);
 			end = ancestors[end];
 		}
-		path.push_back(a);
+		path.push_back(start);
 		std::reverse(path.begin(), path.end());
 
 		return path;
+	}
+
+	std::vector<int> getMinDistToFloor(int start, int floor) {
+		std::pair<std::vector<int>, std::vector<int> > BFSFromStart = BFS(start);
+		std::vector<int> dist = BFSFromStart.first;
+		std::vector<int> ancestors = BFSFromStart.second;
+
+		int closestNodeId = -1;
+
+		for (int i = 0; i < g.size(); i++) {
+			Node node = g[i];
+			int nodeId = node.getId();
+
+			if (node.getFloor() != floor) {
+				continue;
+			}
+
+			if (closestNodeId == -1) {
+				closestNodeId = nodeId;
+			} else {
+				if (d[nodeId] < d[closestNodeId]) {
+					closestNodeId = nodeId;
+				}
+			}
+		}
+
+		return restorePath(ancestors, start, closestNodeId);
+	}
+
+	std::vector<int> getMinDist(int start, int end) {
+		std::pair<std::vector<int>, std::vector<int> > BFSFromStart = BFS(start);
+		std::vector<int> ancestors = BFSFromStart.second;
+		std::vector<int> path;
+
+		return restorePath(ancestors, start, end);
 	}
 
 	std::string pathDescription(std::vector<int> path) {
@@ -371,7 +404,9 @@ PYBIND11_MODULE(graph, m) {
     	.def("check_by_name", &Graph::checkByName)
     	.def("get_node", &Graph::getNode)
     	.def("bfs", &Graph::BFS)
+    	.def("restore_path", &Graph::restorePath)
     	.def("get_min_dist", &Graph::getMinDist)
+    	.def("get_min_dist_to_floor", &Graph::getMinDistToFloor)
     	.def("get_path_on_floor", &Graph::getPathOnFloor)
     	.def("get_direction", &Graph::getDirection)
     	.def("get_reverse_direction", &Graph::getReverseDirection)
