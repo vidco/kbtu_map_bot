@@ -28,18 +28,18 @@ def path_to(update, context):
     Check if node exists, if not return to FIRST
     Then ask for final location
     """
-    node_id = GRAPH.check_by_name(update.message.text)
+    node_id = GRAPH.get_id_by_location(update.message.text)
 
-    if node_id:
+    if node_id == -1:
+        update.message.reply_text('Not found. Try again')
+
+        return FIRST
+
+    else:
         context.user_data['from'] = node_id
         update.message.reply_text('Where you want to go?')
 
         return SECOND
-
-    else:
-        update.message.reply_text('Not found. Try again')
-
-        return FIRST
 
 
 @timing_decorator
@@ -48,22 +48,21 @@ def path(update, context):
     Check if node exists, if not return to SECOND
     Calculate and return path between two locations
     """
-    id_to = GRAPH.check_by_name(update.message.text)
+    id_to = GRAPH.get_id_by_location(update.message.text)
 
-    if not id_to:
+    if id_to == -1:
         update.message.reply_text('Not found. Try again')
 
         return SECOND
 
     minimal_path = GRAPH.get_min_dist(context.user_data.get('from'), id_to)
 
-    print(minimal_path)
+    print('path: ' + str(minimal_path))
 
     path_coordinates = GRAPH.get_path_on_floor(minimal_path, SIDE_DELTA)
 
-    print(path_coordinates)
+    print('floor paths: ' + str(path_coordinates))
 
-    # Draw on template image nodes
     images = draw(path_coordinates)
 
     update.message.reply_text(GRAPH.path_description(minimal_path))
@@ -81,6 +80,8 @@ def cancel(update, context):
         del context.user_data['from']
 
     update.message.reply_text('Canceled')
+
+    return ConversationHandler.END
 
 
 @run_async
@@ -101,8 +102,8 @@ def main():
         ConversationHandler(
             entry_points=[CommandHandler('path', path_from)],
             states={
-                FIRST: [MessageHandler(Filters.text, path_to)],
-                SECOND: [MessageHandler(Filters.text, path)]
+                FIRST: [MessageHandler(Filters.regex('^[0-9]{3}$'), path_to)],
+                SECOND: [MessageHandler(Filters.regex('^[0-9]{3}$'), path)]
             },
             fallbacks=[CommandHandler('cancel', cancel)]
         )
