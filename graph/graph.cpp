@@ -212,7 +212,7 @@ struct Graph {
 	}
 
 	std::string floorToString(int floor) {
-		string floorString = std::to_string(floor);
+		std::string floorString = std::to_string(floor);
 		if (floor == 1) {
 			floorString += "st ";
 		} else if (floor == 2) {
