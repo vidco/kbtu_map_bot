@@ -131,6 +131,85 @@ struct Graph {
 		return -1;
 	}
 
+	Direction getDirection(std::pair<int, int> from, std::pair<int, int> to) {
+		int xd = to.first - from.first;
+		int yd = to.second - from.second;
+		if (!xd) {
+			if (yd > 0) {
+				return DOWN;
+			} else {
+				return UP;
+			}
+		} else {
+			if (xd > 0) {
+				return RIGHT;
+			} else {
+				return LEFT;
+			}
+		}
+	}
+
+	Direction getDirectionBySide(std::string direction) {
+	    if (direction == "left") {
+	        return RIGHT;
+	    } else if (direction == "right") {
+	        return LEFT;
+	    } else if (direction == "down") {
+	        return UP;
+	    } else {
+	        return DOWN;
+	    }
+	}
+
+	Direction getReverseDirection(Direction direction) {
+		if (direction == UP) {
+			return DOWN;
+		} else if (direction == DOWN) {
+			return UP;
+		} else if (direction == LEFT) {
+			return RIGHT;
+		} else {
+			return LEFT;
+		}
+	}
+
+	std::string getCross(Direction first, Direction second) {
+		if (first == second) {
+			return "straight";
+		} else if ((second - first + 4) % 4 == 1) {
+			return "right";
+		} else {
+			return "left";
+		}
+	} 
+
+	std::string getStairsDirection(int prevFloor, int nextFloor) {
+		if (prevFloor > nextFloor) {
+			return "go downstairs to the ";
+		} else {
+			return "go upstairs to the ";
+		}
+	}
+
+	std::string floorToString(int floor) {
+
+		std::string floorString = std::to_string(floor);
+
+		if (floor == 1) {
+			floorString += "st ";
+		} else if (floor == 2) {
+			floorString += "nd ";
+		} else if (floor == 3) {
+			floorString += "rd ";
+		} else {
+			floorString += "th ";
+		}
+
+		floorString += "floor";
+
+		return floorString;
+	}
+
 	std::pair<std::vector<int>, std::vector<int> > BFS(int start) {
 		std::queue<int> q;
 		std::vector<int> dist(int(g.size()) + 1, 0);
@@ -169,69 +248,6 @@ struct Graph {
 		std::reverse(path.begin(), path.end());
 
 		return path;
-	}
-
-	Direction getDirection(std::pair<int, int> from, std::pair<int, int> to) {
-		int xd = to.first - from.first;
-		int yd = to.second - from.second;
-		if (!xd) {
-			if (yd > 0) {
-				return DOWN;
-			} else {
-				return UP;
-			}
-		} else {
-			if (xd > 0) {
-				return RIGHT;
-			} else {
-				return LEFT;
-			}
-		}
-	}
-
-	Direction getDirectionBySide(std::string direction) {
-	    if (direction == "left") {
-	        return RIGHT;
-	    } else if (direction == "right") {
-	        return LEFT;
-	    } else if (direction == "down") {
-	        return UP;
-	    } else {
-	        return DOWN;
-	    }
-	}
-
-	std::string getCross(Direction first, Direction second) {
-		if (first == second) {
-			return "straight";
-		} else if ((second - first + 4) % 4 == 1) {
-			return "right";
-		} else {
-			return "left";
-		}
-	} 
-
-	std::string getStairsDirection(int prevFloor, int nextFloor) {
-		if (prevFloor > nextFloor) {
-			return "go downstairs to the ";
-		} else {
-			return "go upstairs to the ";
-		}
-	}
-
-	std::string floorToString(int floor) {
-		std::string floorString = std::to_string(floor);
-		if (floor == 1) {
-			floorString += "st ";
-		} else if (floor == 2) {
-			floorString += "nd ";
-		} else if (floor == 3) {
-			floorString += "rd ";
-		} else {
-			floorString += "th ";
-		}
-		floorString += "floor";
-		return floorString;
 	}
 
 	std::string pathDescription(std::vector<int> path) {
@@ -275,7 +291,27 @@ struct Graph {
 				textPath += getCross(first, second);
 
 			} else {
+
 				textPath += location;
+
+				if (i == 0) {
+
+					Direction first = getDirectionBySide(getNode(path[i]).getSide());
+					std::pair<int, int> curCoords = getNode(path[i]).getCoordinates();
+					std::pair<int, int> nextCoords = getNode(path[i + 1]).getCoordinates();
+					Direction second = getDirection(curCoords, nextCoords);
+
+				} else if (i == int(path.size()) - 1) {
+
+					Direction second = getReverseDirection(getDirectionBySide(getNode(path[i]).getSide()));
+					std::pair<int, int> curCoords = getNode(path[i]).getCoordinates();
+					std::pair<int, int> prevCoords = getNode(path[i - 1]).getCoordinates();
+					Direction first = getDirection(prevCoords, curCoords);
+
+				}
+
+				textPath += " -> ";
+				textPath += getCross(first, second);
 			}
 
 			if (i != int(path.size()) - 1) {
@@ -338,6 +374,7 @@ PYBIND11_MODULE(graph, m) {
     	.def("get_min_dist", &Graph::getMinDist)
     	.def("get_path_on_floor", &Graph::getPathOnFloor)
     	.def("get_direction", &Graph::getDirection)
+    	.def("get_reverse_direction", &Graph::getReverseDirection)
     	.def("get_cross", &Graph::getCross)
     	.def("path_description", &Graph::pathDescription)
     	.def("get_stairs_direction", &Graph::getStairsDirection)
