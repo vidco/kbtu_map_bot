@@ -131,12 +131,12 @@ struct Graph {
 		return -1;
 	}
 
-	std::vector<int> getMinDist(int a, int b) {
+	std::pair<std::vector<int>, std::vector<int> > BFS(int start) {
 		std::queue<int> q;
 		std::vector<int> dist(int(g.size()) + 1, 0);
-		std::vector<int> p(int(g.size()) + 1, 0);
-		std::vector<int> path;
-		q.push(a);
+		std::vector<int> ancestors(int(g.size()) + 1, 0);
+
+		q.push(start);
 
 		while (!q.empty()) {
 			int nodeId = q.front();
@@ -147,15 +147,23 @@ struct Graph {
 				int toId = adjacents[i];
 				if (dist[toId] == 0) {
 					dist[toId] = dist[nodeId] + 1;
-					p[toId] = nodeId;
+					ancestors[toId] = nodeId;
 					q.push(toId);
 				}
 			}
 		}
 
-		while (b != a) {
-			path.push_back(b);
-			b = p[b];
+		return std::make_pair(dist, ancestors);
+	}
+
+	std::vector<int> getMinDist(int start, int end) {
+		std::pair<std::vector<int>, std::vector<int> > BFSFromStart = BFS(start);
+		std::vector<int> ancestors = BFSFromStart.second;
+		std::vector<int> path;
+
+		while (end != start) {
+			path.push_back(end);
+			end = ancestors[end];
 		}
 		path.push_back(a);
 		std::reverse(path.begin(), path.end());
@@ -326,6 +334,7 @@ PYBIND11_MODULE(graph, m) {
     	.def(py::init<std::string>())
     	.def("check_by_name", &Graph::checkByName)
     	.def("get_node", &Graph::getNode)
+    	.def("bfs", &Graph::BFS)
     	.def("get_min_dist", &Graph::getMinDist)
     	.def("get_path_on_floor", &Graph::getPathOnFloor)
     	.def("get_direction", &Graph::getDirection)
