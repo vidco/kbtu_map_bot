@@ -23,17 +23,17 @@ struct Node {
 	int x;
 	int y;
 	int floor;
-	std::string side;
-	std::vector<int> adjacents;
+	Direction direction;
+	std::vector<int> neighbors;
 
-	Node(int id, std::string location, int x, int y, int floor, std::string side, std::vector<int> adjacents) {
+	Node(int id, std::string location, int x, int y, int floor, std::string direction, std::vector<int> neighbors) {
 		this->id = id;
 		this->location = location;
 		this->x = x;
 		this->y = y;
 		this->floor = floor;
-		this->side = side;
-		this->adjacents = adjacents;
+		this->setDirection(direction);
+		this->neighbors = neighbors;
 	}
 
 	int getId() {
@@ -52,24 +52,52 @@ struct Node {
 		return this->floor;
 	}
 
-	std::string getSide() {
-	    return this->side;
+	Direction getDirection() {
+	    return this->direction;
 	}
 
-	std::vector<int> getAdjacents() {
-		return this->adjacents;
+	Direction getReverseDirection() {
+		switch (this->direction) {
+            case LEFT:
+                return RIGHT;
+            case RIGHT:
+                return LEFT;
+            case UP:
+                return DOWN;
+            case DOWN:
+            default:
+                return UP;
+        }
 	}
 
-	std::pair<int, int> getSideCoordinates(int delta) {
-	    if (this->side == "left") {
-	        return std::make_pair(this->x - delta, this->y);
-	    } else if (this->side == "right") {
-	        return std::make_pair(this->x + delta, this->y);
-	    } else if (this->side == "up") {
-	        return std::make_pair(this->x, this->y - delta);
+	void setDirection(std::string direction) {
+	    if (direction == "left") {
+	        this->direction = LEFT;
+	    } else if (direction == "right") {
+	        this->direction = RIGHT;
+	    } else if (direction == "up") {
+	        this->direction = UP;
 	    } else {
-	        return std::make_pair(this->x, this->y + delta);
+	        this->direction = DOWN;
 	    }
+	}
+
+	std::vector<int> getNeighbors() {
+		return this->neighbors;
+	}
+
+	std::pair<int, int> getShiftedCoordinates(int delta) {
+        switch (this->direction) {
+            case LEFT:
+                return std::make_pair(this->x - delta, this->y);
+            case RIGHT:
+                return std::make_pair(this->x + delta, this->y);
+            case UP:
+                return std::make_pair(this->x, this->y - delta);
+            case DOWN:
+            default:
+                return std::make_pair(this->x, this->y + delta);
+        }
 	}
 };
 
@@ -82,12 +110,12 @@ struct Graph {
 		std::ifstream fin;
 		fin.open(path);
 		std::vector<std::string> row;
-		std::vector<int> adjacents;
+		std::vector<int> neighbors;
 		std::string temp, line, word;
 
 		while (!fin.eof()) {
 			row.clear();
-			adjacents.clear();
+			neighbors.clear();
 
 			fin >> line;
 			std::stringstream s(line);
@@ -100,15 +128,15 @@ struct Graph {
 			int x = stoi(row[2]);
 			int y = stoi(row[3]);
 			int floor = stoi(row[4]);
-			std::string side = row[5];
-			std::stringstream adj(row[6]);
+			std::string direction = row[5];
+			std::stringstream neighborsStream(row[6]);
 
 			std::string nei;
-			while (getline(adj, nei, '-')) {
-				adjacents.push_back(stoi(nei));
+			while (getline(neighborsStream, nei, '-')) {
+				neighbors.push_back(stoi(nei));
 			}
 
-			Node *node = new Node(id, location, x, y, floor, side, adjacents);
+			Node *node = new Node(id, location, x, y, floor, direction, neighbors);
 			g.push_back(*node);
 		}
 	}
@@ -119,10 +147,10 @@ struct Graph {
 				return g[i];
 			}
 		}
-		return Node{-1, "", -1, -1, -1, "", std::vector<int>(0)};
+		return Node{-1, "", -1, -1, -1, "", std::vector<int>(0)};   // Todo: fix or check it!
 	}
 
-	int checkByName(std::string location) {
+	int getIdByLocation(std::string location) {
 		for (int i = 0; i < int(g.size()); i++) {
 			if (g[i].getLocation() == location) {
 				return g[i].getId();
@@ -131,41 +159,19 @@ struct Graph {
 		return -1;
 	}
 
-	std::vector<int> getMinDist(int a, int b) {
-		std::queue<int> q;
-		std::vector<int> dist(int(g.size()) + 1, 0);
-		std::vector<int> p(int(g.size()) + 1, 0);
-		std::vector<int> path;
-		q.push(a);
-
-		while (!q.empty()) {
-			int nodeId = q.front();
-			q.pop();
-			Node node = getNode(nodeId);
-			std::vector<int> adjacents = node.getAdjacents();
-			for (int i = 0; i < (int) adjacents.size(); i++) {
-				int toId = adjacents[i];
-				if (dist[toId] == 0) {
-					dist[toId] = dist[nodeId] + 1;
-					p[toId] = nodeId;
-					q.push(toId);
-				}
+	bool isValidFloor(int floor) {
+		for (int i = 0; i < int(g.size()); i++) {
+			if (g[i].getFloor() == floor) {
+				return true;
 			}
 		}
-
-		while (b != a) {
-			path.push_back(b);
-			b = p[b];
-		}
-		path.push_back(a);
-		std::reverse(path.begin(), path.end());
-
-		return path;
+		return false;
 	}
 
-	Direction getDirection(std::pair<int, int> from, std::pair<int, int> to) {
-		int xd = to.first - from.first;
-		int yd = to.second - from.second;
+	Direction getDirection(Node from, Node to) {
+		int xd = to.getCoordinates().first - from.getCoordinates().first;
+		int yd = to.getCoordinates().second - from.getCoordinates().second;
+
 		if (!xd) {
 			if (yd > 0) {
 				return DOWN;
@@ -179,18 +185,6 @@ struct Graph {
 				return LEFT;
 			}
 		}
-	}
-
-	Direction getDirectionBySide(std::string direction) {
-	    if (direction == "left") {
-	        return RIGHT;
-	    } else if (direction == "right") {
-	        return LEFT;
-	    } else if (direction == "down") {
-	        return UP;
-	    } else {
-	        return DOWN;
-	    }
 	}
 
 	std::string getCross(Direction first, Direction second) {
@@ -212,18 +206,95 @@ struct Graph {
 	}
 
 	std::string floorToString(int floor) {
+
 		std::string floorString = std::to_string(floor);
+
 		if (floor == 1) {
-			floorString += "st ";
+			floorString += "st";
 		} else if (floor == 2) {
-			floorString += "nd ";
+			floorString += "nd";
 		} else if (floor == 3) {
-			floorString += "rd ";
+			floorString += "rd";
 		} else {
-			floorString += "th ";
+			floorString += "th";
 		}
-		floorString += "floor";
+
+		floorString += " floor";
+
 		return floorString;
+	}
+
+	std::pair<std::vector<int>, std::vector<int> > BFS(int start) {
+		std::queue<int> q;
+		std::vector<int> dist(int(g.size()) + 1, 0);
+		std::vector<int> ancestors(int(g.size()) + 1, 0);
+
+		q.push(start);
+
+		while (!q.empty()) {
+			int nodeId = q.front();
+			q.pop();
+			Node node = getNode(nodeId);
+			std::vector<int> neighbors = node.getNeighbors();
+			for (int i = 0; i < int(neighbors.size()); i++) {
+				int toId = neighbors[i];
+				if (dist[toId] == 0) {
+					dist[toId] = dist[nodeId] + 1;
+					ancestors[toId] = nodeId;
+					q.push(toId);
+				}
+			}
+		}
+
+		return std::make_pair(dist, ancestors);
+	}
+
+	std::vector<int> restorePath(std::vector<int> ancestors, int start, int end) {
+		std::vector<int> path;
+
+		while (end != start) {
+			path.push_back(end);
+			end = ancestors[end];
+		}
+		path.push_back(start);
+		std::reverse(path.begin(), path.end());
+
+		return path;
+	}
+
+	std::vector<int> getMinDistToFloor(int start, int floor) {
+		std::pair<std::vector<int>, std::vector<int> > BFSFromStart = BFS(start);
+		std::vector<int> dist = BFSFromStart.first;
+		std::vector<int> ancestors = BFSFromStart.second;
+
+		int closestNodeId = -1;
+
+		for (int i = 0; i < int(g.size()); i++) {
+			Node node = g[i];
+			int nodeId = node.getId();
+
+			if (node.getFloor() != floor) {
+				continue;
+			}
+
+			if (closestNodeId == -1) {
+				closestNodeId = nodeId;
+			} else {
+				if (dist[nodeId] < dist[closestNodeId]) {
+					closestNodeId = nodeId;
+				}
+			}
+		}
+
+		return restorePath(ancestors, start, closestNodeId);
+	}
+
+	std::vector<int> getMinDist(int start, int end) {
+		std::pair<std::vector<int>, std::vector<int> > BFSFromStart = BFS(start);
+		std::vector<int> ancestors = BFSFromStart.second;
+		std::vector<int> path;
+
+		return restorePath(ancestors, start, end);
 	}
 
 	std::string pathDescription(std::vector<int> path) {
@@ -232,21 +303,20 @@ struct Graph {
 
 		for (int i = 0; i < int(path.size()); i++) {
 
-			std::string location = getNode(path[i]).getLocation();
+            Node currentNode = getNode(path[i]);
+            Node nextNode = getNode(path[i + 1]);
+			std::string location = currentNode.getLocation();
 
-			if (location == "cross" or (location == "ladder" and getNode(path[i + 1]).getLocation() != "ladder")) {
+			if (location == "cross" or (location == "ladder" and nextNode.getLocation() != "ladder")) {
 
-				std::pair<int, int> prevCoords = getNode(path[i - 1]).getCoordinates();
-				std::pair<int, int> curCoords = getNode(path[i]).getCoordinates();
-				std::pair<int, int> nextCoords = getNode(path[i + 1]).getCoordinates();
-				Direction first = getDirection(prevCoords, curCoords);
-				Direction second = getDirection(curCoords, nextCoords);
-				std::string cross = getCross(first, second);
-				textPath += cross;
+				Direction first = getDirection(getNode(path[i - 1]), currentNode);
+				Direction second = getDirection(currentNode, nextNode);
+
+				textPath += getCross(first, second);
 
 			} else if (location == "ladder") {
 
-				int prevFloor = getNode(path[i]).getFloor();
+				int prevFloor = currentNode.getFloor();
 
 				while (location == "ladder") {
 					i++;
@@ -254,20 +324,34 @@ struct Graph {
 				}
 				i--;
 
-				int nextFloor = getNode(path[i]).getFloor();
+				Node currentNode = getNode(path[i]);    // Because of iteration in while, new current node
+
+				int nextFloor = currentNode.getFloor();
 				textPath += getStairsDirection(prevFloor, nextFloor);
 				textPath += floorToString(nextFloor);
 
-                Direction first = getDirectionBySide(getNode(path[i]).getSide());
-                std::pair<int, int> curCoords = getNode(path[i]).getCoordinates();
-				std::pair<int, int> nextCoords = getNode(path[i + 1]).getCoordinates();
-				Direction second = getDirection(curCoords, nextCoords);
+                Direction first = currentNode.getReverseDirection();
+				Direction second = getDirection(currentNode, getNode(path[i + 1]));
 
                 textPath += " -> ";
 				textPath += getCross(first, second);
 
 			} else {
+
 				textPath += location;
+
+				if (i == 0) {
+					Direction first = currentNode.getReverseDirection();
+					Direction second = getDirection(currentNode, nextNode);
+                    textPath += " -> ";
+				    textPath += getCross(first, second);
+				} else if (i == int(path.size()) - 1) {
+
+					Direction first = getDirection(getNode(path[i - 1]), currentNode);
+					Direction second = currentNode.getDirection();
+					textPath += " -> ";
+                    textPath += getCross(first, second);
+				}
 			}
 
 			if (i != int(path.size()) - 1) {
@@ -285,7 +369,7 @@ struct Graph {
 		int currentFloor;
 
 		Node node = getNode(path[0]);
-        currentPath.push_back(node.getSideCoordinates(delta));
+        currentPath.push_back(node.getShiftedCoordinates(delta));
 		currentPath.push_back(node.getCoordinates());
 		currentFloor = node.getFloor();
 
@@ -293,18 +377,19 @@ struct Graph {
 			node = getNode(path[i]);
 			if (node.getFloor() != currentFloor) {
 				if (currentPath.size() > 1) {
-                    currentPath.push_back(getNode(path[i - 1]).getSideCoordinates(delta));
+                    currentPath.push_back(getNode(path[i - 1]).getShiftedCoordinates(delta));
 					pathOnFloor[currentFloor].push_back(currentPath);
                 }
 				currentPath.clear();
-                currentPath.push_back(node.getSideCoordinates(delta));
+                currentPath.push_back(node.getShiftedCoordinates(delta));
 				currentFloor = node.getFloor();
 			}
 			currentPath.push_back(node.getCoordinates());
 		}
 		
 		if (currentPath.size() > 1) {
-            currentPath.push_back(getNode(path[int(path.size()) - 1]).getSideCoordinates(delta));
+		    Node node = getNode(path[int(path.size()) - 1]);
+            currentPath.push_back(node.getShiftedCoordinates(delta));
 			pathOnFloor[currentFloor].push_back(currentPath);
 		}
 		return pathOnFloor;
@@ -318,22 +403,27 @@ PYBIND11_MODULE(graph, m) {
     	.def("get_location", &Node::getLocation)
     	.def("get_coordinates", &Node::getCoordinates)
     	.def("get_floor", &Node::getFloor)
-    	.def("get_side", &Node::getSide)
-    	.def("get_adjacents", &Node::getAdjacents)
-    	.def("get_side_coordinates", &Node::getSideCoordinates);
+    	.def("get_direction", &Node::getDirection)
+        .def("get_reverse_direction", &Node::getReverseDirection)
+        .def("set_direction", &Node::setDirection)
+    	.def("get_neighbors", &Node::getNeighbors)
+    	.def("get_shifted_coordinates", &Node::getShiftedCoordinates);
 
     py::class_<Graph>(m, "Graph")
     	.def(py::init<std::string>())
-    	.def("check_by_name", &Graph::checkByName)
+    	.def("get_id_by_location", &Graph::getIdByLocation)
+    	.def("is_valid_floor", &Graph::isValidFloor)
     	.def("get_node", &Graph::getNode)
+    	.def("bfs", &Graph::BFS)
+    	.def("restore_path", &Graph::restorePath)
     	.def("get_min_dist", &Graph::getMinDist)
+    	.def("get_min_dist_to_floor", &Graph::getMinDistToFloor)
     	.def("get_path_on_floor", &Graph::getPathOnFloor)
     	.def("get_direction", &Graph::getDirection)
     	.def("get_cross", &Graph::getCross)
     	.def("path_description", &Graph::pathDescription)
     	.def("get_stairs_direction", &Graph::getStairsDirection)
-    	.def("floor_to_string", &Graph::floorToString)
-        .def("get_direction_by_side", &Graph::getDirectionBySide);
+    	.def("floor_to_string", &Graph::floorToString);
 
     py::enum_<Direction>(m, "Direction")
     	.value("UP", Direction::UP)

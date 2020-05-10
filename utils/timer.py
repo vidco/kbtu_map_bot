@@ -1,4 +1,8 @@
+import logging
 import time
+
+logging.basicConfig(format='%(asctime)s [%(name)s] [%(levelname)s] - %(message)s', level=logging.INFO)
+LOG = logging.getLogger('timer')
 
 
 def timing_decorator(func):
@@ -11,7 +15,7 @@ def timing_decorator(func):
         original_return_val = func(*args, **kwargs)
         end = time.time()
 
-        print("time elapsed in ", func.__name__, ": ", end - start, sep='')
+        LOG.info('time taken for %s is %d ms', func.__name__, (end - start) * 1000)
 
         return original_return_val
 
