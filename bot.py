@@ -1,3 +1,5 @@
+import logging
+
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, ConversationHandler
 from telegram.ext.dispatcher import run_async
 
@@ -8,7 +10,9 @@ TOKEN = '1108472031:AAHdZGhDLe5IqCXfpqeR4ibA2nN04lz4r64'        # Bot token
 GRAPH = Graph('graph/nodes.csv')                                # Graph with node information
 PATH_FROM, PATH_TO = range(2)                                   # States of Conversation for path finding
 FLOOR_FROM, FLOOR_TO = range(2)                                 # States of Conversation for path finding
-SIDE_DELTA = 10
+SIDE_DELTA = 10                                                 # Distance between roads and
+logging.basicConfig(format='%(asctime)s [%(name)s] [%(levelname)s] - %(message)s', level=logging.INFO)
+LOG = logging.getLogger('main')                                 # Main logger
 
 
 def start(update, context):
@@ -58,11 +62,11 @@ def path(update, context):
 
     minimal_path = GRAPH.get_min_dist(context.user_data.get('from'), id_to)
 
-    print('path: ' + str(minimal_path))
+    LOG.info('full path: %s', minimal_path)
 
     path_coordinates = GRAPH.get_path_on_floor(minimal_path, SIDE_DELTA)
 
-    print('floor paths: ' + str(path_coordinates))
+    LOG.info('floor path: %s', path_coordinates)
 
     images = draw(path_coordinates)
 
@@ -81,6 +85,7 @@ def path_cancel(update, context):
         del context.user_data['from']
 
     update.message.reply_text('Canceled')
+    LOG.info('Update "%s" canceled', update)
 
     return ConversationHandler.END
 
@@ -134,11 +139,11 @@ def floor(update, context):
 
     minimal_path = GRAPH.get_min_dist_to_floor(context.user_data.get('from'), _floor)
 
-    print('path: ' + str(minimal_path))
+    LOG.info('full path: %s', minimal_path)
 
     path_coordinates = GRAPH.get_path_on_floor(minimal_path, SIDE_DELTA)
 
-    print('floor paths: ' + str(path_coordinates))
+    LOG.info('floor path: %s', path_coordinates)
 
     images = draw(path_coordinates)
 
@@ -157,6 +162,7 @@ def floor_cancel(update, context):
         del context.user_data['from']
 
     update.message.reply_text('Canceled')
+    LOG.info('Update "%s" canceled', update)
 
     return ConversationHandler.END
 
@@ -165,6 +171,11 @@ def floor_cancel(update, context):
 def _send_photo_async(update, bot, images):
     for image in images:
         bot.send_photo(chat_id=update.message.chat_id, photo=image)
+
+
+def error(update, context):
+    """Log Errors caused by Updates."""
+    LOG.error('Update "%s" caused error "%s"', update, context.error)
 
 
 def main():
@@ -197,6 +208,8 @@ def main():
             fallbacks=[CommandHandler('cancel', floor_cancel)]
         )
     )
+
+    updater.dispatcher.add_error_handler(error)
 
     updater.start_polling()
     updater.idle()
