@@ -159,6 +159,15 @@ struct Graph {
 		return -1;
 	}
 
+	bool isValidFloor(int floor) {
+		for (int i = 0; i < int(g.size()); i++) {
+			if (g[i].getFloor() == floor) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	Direction getDirection(Node from, Node to) {
 		int xd = to.getCoordinates().first - from.getCoordinates().first;
 		int yd = to.getCoordinates().second - from.getCoordinates().second;
@@ -403,6 +412,7 @@ PYBIND11_MODULE(graph, m) {
     py::class_<Graph>(m, "Graph")
     	.def(py::init<std::string>())
     	.def("get_id_by_location", &Graph::getIdByLocation)
+    	.def("is_valid_floor", &Graph::isValidFloor)
     	.def("get_node", &Graph::getNode)
     	.def("bfs", &Graph::BFS)
     	.def("restore_path", &Graph::restorePath)
