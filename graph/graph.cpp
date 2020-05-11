@@ -278,9 +278,9 @@ struct Graph {
 		return restorePath(ancestors, start, end);
 	}
 
-	std::vector<string> pathDescription(std::vector<int> path) {
+	std::vector<std::string> pathDescription(std::vector<int> path) {
 
-		std::vector<string> pathList;
+		std::vector<std::string> pathList;
 
 		for (int i = 0; i < int(path.size()); i++) {
 
@@ -330,14 +330,14 @@ struct Graph {
 					Direction second = getDirection(currentNode, nextNode);
 					std::string cross = getCross(first, second);
 					if (cross != "straight") {
-						pathList.push_back(cross)
+						pathList.push_back(cross);
 					}
 				} else if (i == int(path.size()) - 1) {
 					Direction first = getDirection(getNode(path[i - 1]), currentNode);
 					Direction second = currentNode.getDirection();
                     std::string cross = getCross(first, second);
 					if (cross != "straight") {
-						pathList.push_back(cross)
+						pathList.push_back(cross);
 					}
 				}
 			}
