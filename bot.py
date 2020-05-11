@@ -4,7 +4,7 @@ from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, Conve
 from telegram.ext.dispatcher import run_async
 
 from graph import Graph
-from utils import timing_decorator, draw
+from utils import timing_decorator, draw, describe
 
 TOKEN = '1108472031:AAHdZGhDLe5IqCXfpqeR4ibA2nN04lz4r64'        # Bot token
 GRAPH = Graph('graph/nodes.csv')                                # Graph with node information
@@ -70,7 +70,7 @@ def path(update, context):
 
     images = draw(path_coordinates)
 
-    update.message.reply_text(GRAPH.path_description(minimal_path))
+    update.message.reply_text(describe(GRAPH.path_description(minimal_path)))
 
     _send_photo_async(update, context.bot, images)
 
