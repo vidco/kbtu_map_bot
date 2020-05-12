@@ -13,6 +13,8 @@ FLOOR_FROM, FLOOR_TO = range(2)                                 # States of Conv
 SIDE_DELTA = 10                                                 # Distance between roads and
 logging.basicConfig(format='%(asctime)s [%(name)s] [%(levelname)s] - %(message)s', level=logging.INFO)
 LOG = logging.getLogger('main')                                 # Main logger
+LANG = 'eng'
+LEVEL = 2
 
 
 def start(update, context):
@@ -70,7 +72,9 @@ def path(update, context):
 
     images = draw(path_coordinates)
 
-    update.message.reply_text(describe(GRAPH.path_description(minimal_path)))
+    print(GRAPH.path_description(minimal_path))
+
+    update.message.reply_text(describe(GRAPH.path_description(minimal_path), LANG, LEVEL))
 
     _send_photo_async(update, context.bot, images)
 

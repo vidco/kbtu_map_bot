@@ -294,9 +294,7 @@ struct Graph {
 				Direction second = getDirection(currentNode, nextNode);
 
 				std::string cross = getCross(first, second);
-				if (cross != "straight") {
-					pathList.push_back(cross);
-				}
+				pathList.push_back(cross);
 
 			} else if (location == "ladder") {
 
@@ -317,9 +315,7 @@ struct Graph {
 				Direction second = getDirection(currentNode, getNode(path[i + 1]));
 
 				std::string cross = getCross(first, second);
-				if (cross != "straight") {
-					pathList.push_back(cross);
-				}
+				pathList.push_back(cross);
 
 			} else {
 
@@ -329,16 +325,12 @@ struct Graph {
 					Direction first = currentNode.getReverseDirection();
 					Direction second = getDirection(currentNode, nextNode);
 					std::string cross = getCross(first, second);
-					if (cross != "straight") {
-						pathList.push_back(cross);
-					}
+					pathList.push_back(cross);
 				} else if (i == int(path.size()) - 1) {
 					Direction first = getDirection(getNode(path[i - 1]), currentNode);
 					Direction second = currentNode.getDirection();
                     std::string cross = getCross(first, second);
-					if (cross != "straight") {
-						pathList.push_back(cross);
-					}
+					pathList.push_back(cross);
 				}
 			}
 		}
