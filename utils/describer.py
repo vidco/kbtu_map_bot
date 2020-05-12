@@ -5,11 +5,11 @@ actions = ["left", "right", "up_5", "up_4", "up_3", "up_2", "up_1", "up_0",
 def floor_ending(floor):
     if floor == '0':
         return ""
-    elif floor == 1:
+    elif floor == '1':
         return "st"
-    elif floor == 2:
+    elif floor == '2':
         return "nd"
-    elif floor == 3:
+    elif floor == '3':
         return "rd"
     else:
         return "th"
