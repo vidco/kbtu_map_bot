@@ -199,29 +199,10 @@ struct Graph {
 
 	std::string getStairsDirection(int prevFloor, int nextFloor) {
 		if (prevFloor > nextFloor) {
-			return "go downstairs to the ";
+			return "down_" + std::to_string(nextFloor);
 		} else {
-			return "go upstairs to the ";
+			return "up_" + std::to_string(nextFloor);
 		}
-	}
-
-	std::string floorToString(int floor) {
-
-		std::string floorString = std::to_string(floor);
-
-		if (floor == 1) {
-			floorString += "st";
-		} else if (floor == 2) {
-			floorString += "nd";
-		} else if (floor == 3) {
-			floorString += "rd";
-		} else {
-			floorString += "th";
-		}
-
-		floorString += " floor";
-
-		return floorString;
 	}
 
 	std::pair<std::vector<int>, std::vector<int> > BFS(int start) {
@@ -297,9 +278,9 @@ struct Graph {
 		return restorePath(ancestors, start, end);
 	}
 
-	std::string pathDescription(std::vector<int> path) {
+	std::vector<std::string> pathDescription(std::vector<int> path) {
 
-		std::string textPath = "";
+		std::vector<std::string> pathList;
 
 		for (int i = 0; i < int(path.size()); i++) {
 
@@ -312,7 +293,8 @@ struct Graph {
 				Direction first = getDirection(getNode(path[i - 1]), currentNode);
 				Direction second = getDirection(currentNode, nextNode);
 
-				textPath += getCross(first, second);
+				std::string cross = getCross(first, second);
+				pathList.push_back(cross);
 
 			} else if (location == "ladder") {
 
@@ -327,39 +309,33 @@ struct Graph {
 				Node currentNode = getNode(path[i]);    // Because of iteration in while, new current node
 
 				int nextFloor = currentNode.getFloor();
-				textPath += getStairsDirection(prevFloor, nextFloor);
-				textPath += floorToString(nextFloor);
+				pathList.push_back(getStairsDirection(prevFloor, nextFloor));
 
                 Direction first = currentNode.getReverseDirection();
 				Direction second = getDirection(currentNode, getNode(path[i + 1]));
 
-                textPath += " -> ";
-				textPath += getCross(first, second);
+				std::string cross = getCross(first, second);
+				pathList.push_back(cross);
 
 			} else {
 
-				textPath += location;
+				pathList.push_back(location);
 
 				if (i == 0) {
 					Direction first = currentNode.getReverseDirection();
 					Direction second = getDirection(currentNode, nextNode);
-                    textPath += " -> ";
-				    textPath += getCross(first, second);
+					std::string cross = getCross(first, second);
+					pathList.push_back(cross);
 				} else if (i == int(path.size()) - 1) {
-
 					Direction first = getDirection(getNode(path[i - 1]), currentNode);
 					Direction second = currentNode.getDirection();
-					textPath += " -> ";
-                    textPath += getCross(first, second);
+                    std::string cross = getCross(first, second);
+					pathList.push_back(cross);
 				}
-			}
-
-			if (i != int(path.size()) - 1) {
-				textPath += " -> ";
 			}
 		}
 
-		return textPath;
+		return pathList;
 	}
 
 	std::map<int, std::vector<std::vector<std::pair<int, int> > > > getPathOnFloor(std::vector<int> path, int delta) {
@@ -422,9 +398,8 @@ PYBIND11_MODULE(graph, m) {
     	.def("get_direction", &Graph::getDirection)
     	.def("get_cross", &Graph::getCross)
     	.def("path_description", &Graph::pathDescription)
-    	.def("get_stairs_direction", &Graph::getStairsDirection)
-    	.def("floor_to_string", &Graph::floorToString);
-
+    	.def("get_stairs_direction", &Graph::getStairsDirection);
+    	
     py::enum_<Direction>(m, "Direction")
     	.value("UP", Direction::UP)
     	.value("DOWN", Direction::DOWN)
