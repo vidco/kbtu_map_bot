@@ -3,13 +3,13 @@ import logging
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, ConversationHandler
 from telegram.ext.dispatcher import run_async
 
+from db import Database
 from graph import Graph
-from utils import timing_decorator, draw, describe, Database, ACTIONS, ERRORS
-
+from utils import timing_decorator, draw, describe, ACTIONS, ERRORS
 
 TOKEN = '1108472031:AAHdZGhDLe5IqCXfpqeR4ibA2nN04lz4r64'        # Bot token
 GRAPH = Graph('graph/nodes.csv')                                # Graph with node information
-USERS = Database(r"utils/users.db")                             # Users database
+USERS = Database('users.db')                             # Users database
 PATH_FROM, PATH_TO = range(2)                                   # States of Conversation for path finding
 FLOOR_FROM, FLOOR_TO = range(2)                                 # States of Conversation for path finding
 SIDE_DELTA = 10                                                 # Distance between roads and
@@ -30,11 +30,11 @@ def get_user_level(update, context):
 def start(update, context):
     user = update.message.from_user
     telegram_id = user.id
-    if not USERS.users_exists(telegram_id):
-        USERS.create_user((telegram_id,))
+
+    if not USERS.user_exists(telegram_id):
+        USERS.create_user(telegram_id)
 
     language = USERS.select_language_by_telegram_id(telegram_id)
-
     update.message.reply_text(ACTIONS.get('greetings').get(language))
 
 
@@ -42,7 +42,7 @@ def path_from(update, context):
     """
     Ask for initial location
     """
-    language = get_user_language(update, context);
+    language = get_user_language(update, context)
 
     update.message.reply_text(ACTIONS.get('ask_location').get(language))
 
@@ -96,9 +96,10 @@ def path(update, context):
 
     images = draw(path_coordinates)
 
-    print(GRAPH.path_description(minimal_path))
+    message = describe(GRAPH.path_description(minimal_path), language, level)
 
-    update.message.reply_text(describe(GRAPH.path_description(minimal_path), language, level))
+    if len(message) > 0:
+        update.message.reply_text(message)
 
     _send_photo_async(update, context.bot, images)
 
