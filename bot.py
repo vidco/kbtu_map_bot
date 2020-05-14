@@ -4,28 +4,47 @@ from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, Conve
 from telegram.ext.dispatcher import run_async
 
 from graph import Graph
-from utils import timing_decorator, draw, describe
+from utils import timing_decorator, draw, describe, Database, ACTIONS, ERRORS
+
 
 TOKEN = '1108472031:AAHdZGhDLe5IqCXfpqeR4ibA2nN04lz4r64'        # Bot token
 GRAPH = Graph('graph/nodes.csv')                                # Graph with node information
+USERS = Database(r"utils/users.db")                             # Users database
 PATH_FROM, PATH_TO = range(2)                                   # States of Conversation for path finding
 FLOOR_FROM, FLOOR_TO = range(2)                                 # States of Conversation for path finding
 SIDE_DELTA = 10                                                 # Distance between roads and
 logging.basicConfig(format='%(asctime)s [%(name)s] [%(levelname)s] - %(message)s', level=logging.INFO)
 LOG = logging.getLogger('main')                                 # Main logger
-LANG = 'eng'
-LEVEL = 2
+
+
+def get_user_language(update, context):
+    user = update.message.from_user
+    return USERS.select_language_by_telegram_id(user.id)
+
+
+def get_user_level(update, context):
+    user = update.message.from_user
+    return USERS.select_level_by_telegram_id(user.id)
 
 
 def start(update, context):
-    update.message.reply_text('Hello! I can find fastest path to any place in KBTU')
+    user = update.message.from_user
+    telegram_id = user.id
+    if not USERS.users_exists(telegram_id):
+        USERS.create_user((telegram_id,))
+
+    language = USERS.select_language_by_telegram_id(telegram_id)
+
+    update.message.reply_text(ACTIONS.get('greetings').get(language))
 
 
 def path_from(update, context):
     """
     Ask for initial location
     """
-    update.message.reply_text('Where are you?')
+    language = get_user_language(update, context);
+
+    update.message.reply_text(ACTIONS.get('ask_location').get(language))
 
     return PATH_FROM
 
@@ -35,16 +54,18 @@ def path_to(update, context):
     Check if node exists, if not return to FIRST
     Then ask for final location
     """
+    language = get_user_language(update, context)
+
     node_id = GRAPH.get_id_by_location(update.message.text)
 
     if node_id == -1:
-        update.message.reply_text('Not found. Try again')
+        update.message.reply_text(ERRORS.get('not_found').get(language))
 
         return PATH_FROM
 
     else:
         context.user_data['from'] = node_id
-        update.message.reply_text('Where you want to go?')
+        update.message.reply_text(ACTIONS.get('ask_destination').get(language))
 
         return PATH_TO
 
@@ -55,10 +76,13 @@ def path(update, context):
     Check if node exists, if not return to SECOND
     Calculate and return path between two locations
     """
+    language = get_user_language(update, context)
+    level = get_user_level(update, context)
+
     id_to = GRAPH.get_id_by_location(update.message.text)
 
     if id_to == -1:
-        update.message.reply_text('Not found. Try again')
+        update.message.reply_text(ERRORS.get('not_found').get(language))
 
         return PATH_TO
 
@@ -74,7 +98,7 @@ def path(update, context):
 
     print(GRAPH.path_description(minimal_path))
 
-    update.message.reply_text(describe(GRAPH.path_description(minimal_path), LANG, LEVEL))
+    update.message.reply_text(describe(GRAPH.path_description(minimal_path), language, level))
 
     _send_photo_async(update, context.bot, images)
 
@@ -85,10 +109,12 @@ def path_cancel(update, context):
     """
     Cancel Conversation for path finding and deletes 'from' location if exists
     """
+    language = get_user_language(update, context)
+
     if 'from' in context.user_data:
         del context.user_data['from']
 
-    update.message.reply_text('Canceled')
+    update.message.reply_text(ACTIONS.get('cancel').get(language))
     LOG.info('Update "%s" canceled', update)
 
     return ConversationHandler.END
@@ -98,7 +124,9 @@ def floor_from(update, context):
     """
     Ask for initial location
     """
-    update.message.reply_text('Where are you?')
+    language = get_user_language(update, context)
+
+    update.message.reply_text(ACTIONS.get('ask_location').get(language))
 
     return FLOOR_FROM
 
@@ -108,16 +136,18 @@ def floor_to(update, context):
     Check if node exists, if not return to FIRST
     Then ask for final location
     """
+    language = get_user_language(update, context)
+
     node_id = GRAPH.get_id_by_location(update.message.text)
 
     if node_id == -1:
-        update.message.reply_text('Not found. Try again')
+        update.message.reply_text(ERRORS.get('not_found').get(language))
 
         return FLOOR_FROM
 
     else:
         context.user_data['from'] = node_id
-        update.message.reply_text('What floor do you want to go to?')
+        update.message.reply_text(ACTIONS.get('ask_floor').get(language))
 
         return FLOOR_TO
 
@@ -128,16 +158,18 @@ def floor(update, context):
     Check if node exists, if not return to SECOND
     Calculate and return path between two locations
     """
+    language = get_user_language(update, context)
+
     message = update.message.text
     if not message.isnumeric():
-        update.message.reply_text('Not valid floor')
+        update.message.reply_text(ERRORS.get('invalid_floor').get(language))
 
         return FLOOR_TO
 
     _floor = int(message)
 
     if not GRAPH.is_valid_floor(_floor):
-        update.message.reply_text('Not found. Try again')
+        update.message.reply_text(ERRORS.get('not_found').get(language))
 
         return FLOOR_TO
 
@@ -162,10 +194,12 @@ def floor_cancel(update, context):
     """
     Cancel Conversation for path finding and deletes 'from' location if exists
     """
+    language = get_user_language(update, context)
+
     if 'from' in context.user_data:
         del context.user_data['from']
 
-    update.message.reply_text('Canceled')
+    update.message.reply_text(ACTIONS.get('cancel').get(language))
     LOG.info('Update "%s" canceled', update)
 
     return ConversationHandler.END

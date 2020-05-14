@@ -1,51 +1,12 @@
-ACTIONS = {
-    'leave': {
-        'eng': 'From {departure} turn {direction}'
-    },
-    'arrive': {
-        'eng': '{arrive} will be on the {direction}'
-    },
-    'up': {
-        'eng': 'Go upstairs to {floor} floor and go {direction}'
-    },
-    'down': {
-        'eng': 'Go downstairs to {floor} floor and go {direction}'
-    },
-    'left': {
-        'eng': 'On the cross turn left'
-    },
-    'right': {
-        'eng': 'On the cross turn right'
-    },
-    'straight': {
-        'eng': 'On the cross go straight'
-    }
-}
+from phrases import MOVES, DIRECTIONS, FLOORS
 
 
-def count_floor(floor):
-    result = floor
-
-    if floor == '0':
-        result += ""
-    elif floor == '1':
-        result += "st"
-    elif floor == '2':
-        result += "nd"
-    elif floor == '3':
-        result += "rd"
-    else:
-        result += "th"
-
-    return result
-
-
-def describe(path, lang, level):
+def describe(path, language, level):
 
     if level <= 0 or level > 3:
         return ''
 
-    result = '1. ' + ACTIONS.get('leave').get(lang).format(departure=path[0], direction=path[1]) + '\n'
+    result = '1. ' + MOVES.get('leave').get(language).format(departure=path[0], direction=DIRECTIONS.get(path[1]).get(language)) + '\n'
     counter = 2
 
     i = 2
@@ -68,21 +29,21 @@ def describe(path, lang, level):
             result += str(counter) + '. '
 
             if path[i].startswith('up') or path[i].startswith('down'):
-                result += _describe_floor(path[i], path[i+1], lang)
+                result += _describe_floor(path[i], path[i+1], language)
                 i += 1
             else:
-                result += ACTIONS.get(path[i]).get(lang)
+                result += MOVES.get(path[i]).get(language)
 
         result += '\n'
         counter += 1
         i += 1
 
-    result += str(counter) + '. ' + ACTIONS.get('arrive').get(lang).format(arrive=path[-2], direction=path[-1]) + '\n'
+    result += str(counter) + '. ' + MOVES.get('arrive').get(language).format(arrive=path[-2], direction=DIRECTIONS.get(path[-1]).get(language)) + '\n'
 
     return result
 
 
-def _describe_floor(change_floor, direction, lang):
+def _describe_floor(change_floor, direction, language):
     options = change_floor.split('_')
     up_or_down, floor = options[0], options[1]
-    return ACTIONS.get(up_or_down).get(lang).format(floor=count_floor(floor), direction=direction)
+    return MOVES.get(up_or_down).get(language).format(floor=FLOORS.get(floor).get(language), direction=DIRECTIONS.get(direction).get(language))
