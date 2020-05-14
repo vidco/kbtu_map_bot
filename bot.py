@@ -1,17 +1,19 @@
 import logging
 
+from telegram import ReplyKeyboardMarkup, ReplyKeyboardRemove
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, ConversationHandler
 from telegram.ext.dispatcher import run_async
 
 from db import Database
 from graph import Graph
-from utils import timing_decorator, draw, describe, ACTIONS, ERRORS
+from utils import timing_decorator, draw, describe, ACTIONS, ERRORS, flag, unflag, unflaggable
 
 TOKEN = '1108472031:AAHdZGhDLe5IqCXfpqeR4ibA2nN04lz4r64'        # Bot token
 GRAPH = Graph('graph/nodes.csv')                                # Graph with node information
 USERS = Database('users.db')                             # Users database
 PATH_FROM, PATH_TO = range(2)                                   # States of Conversation for path finding
 FLOOR_FROM, FLOOR_TO = range(2)                                 # States of Conversation for path finding
+FIRST = range(1)
 SIDE_DELTA = 10                                                 # Distance between roads and
 logging.basicConfig(format='%(asctime)s [%(name)s] [%(levelname)s] - %(message)s', level=logging.INFO)
 LOG = logging.getLogger('main')                                 # Main logger
@@ -36,6 +38,67 @@ def start(update, context):
 
     language = USERS.select_language_by_telegram_id(telegram_id)
     update.message.reply_text(ACTIONS.get('greetings').get(language))
+
+
+def change_language(update, context):
+    """
+
+    """
+    language = get_user_language(update, context)
+    custom_keyboard = [[flag('us'), flag('kz'), flag('ru')]]
+    context.bot.send_message(chat_id=update.message.chat_id,
+                             text=ACTIONS.get('ask_language').get(language),
+                             reply_markup=ReplyKeyboardMarkup(custom_keyboard, resize_keyboard=True))
+
+    return FIRST
+
+
+def changing_language(update, context):
+    """
+
+    """
+    if not unflaggable(update.message.text):
+        return FIRST
+
+    text = unflag(update.message.text)
+    telegram_id = update.message.from_user.id
+    USERS.update_user_language(telegram_id, text)
+    language = USERS.select_language_by_telegram_id(telegram_id)
+
+    context.bot.send_message(chat_id=update.message.chat_id,
+                             text=ACTIONS.get('changed_language').get(language),
+                             reply_markup=ReplyKeyboardRemove())
+
+    return ConversationHandler.END
+
+
+def change_level(update, context):
+    """
+
+    """
+    language = get_user_language(update, context)
+    custom_keyboard = [['0', '1', '2', '3']]
+    context.bot.send_message(chat_id=update.message.chat_id,
+                             text=ACTIONS.get('ask_level').get(language),
+                             reply_markup=ReplyKeyboardMarkup(custom_keyboard, resize_keyboard=True))
+
+    return FIRST
+
+
+def changing_level(update, context):
+    """
+
+    """
+    text = update.message.text
+    telegram_id = update.message.from_user.id
+    USERS.update_user_level(telegram_id, text)
+    language = USERS.select_language_by_telegram_id(telegram_id)
+
+    context.bot.send_message(chat_id=update.message.chat_id,
+                             text=ACTIONS.get('changed_level').get(language),
+                             reply_markup=ReplyKeyboardRemove())
+
+    return ConversationHandler.END
 
 
 def path_from(update, context):
@@ -214,7 +277,7 @@ def _send_photo_async(update, bot, images):
 
 def error(update, context):
     """Log Errors caused by Updates."""
-    LOG.error('Update "%s" caused error "%s"', update, context.error)
+    LOG.error(context.error)
 
 
 def main():
@@ -245,6 +308,28 @@ def main():
                 FLOOR_TO: [MessageHandler(Filters.regex('^[0-9]{1}$'), floor)]
             },
             fallbacks=[CommandHandler('cancel', floor_cancel)]
+        )
+    )
+
+    # Register Conversation Handler with /language and /cancel commands
+    updater.dispatcher.add_handler(
+        ConversationHandler(
+            entry_points=[CommandHandler('language', change_language)],
+            states={
+                FIRST: [MessageHandler(Filters.text, changing_language)],
+            },
+            fallbacks=[CommandHandler('cancel', path_cancel)]
+        )
+    )
+
+    # Register Conversation Handler with /language and /cancel commands
+    updater.dispatcher.add_handler(
+        ConversationHandler(
+            entry_points=[CommandHandler('level', change_level)],
+            states={
+                FIRST: [MessageHandler(Filters.regex('^[0-3]{1}$'), changing_level)],
+            },
+            fallbacks=[CommandHandler('cancel', path_cancel)]
         )
     )
 

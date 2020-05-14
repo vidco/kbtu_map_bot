@@ -1,46 +1,70 @@
 ACTIONS = {
 
     'greetings': {
-        'en': 'Hello! I can find fastest path to any place in KBTU!',
+        'us': 'Hello! I can find fastest path to any place in KBTU!',
         'ru': 'Привет! Я могу найти кратчайший путь до любого места в КБТУ!',
         'kz': 'Men qazir ony sigemin!'
     },
 
     'ask_location': {
-        'en': 'Where are you?',
+        'us': 'Where are you?',
         'ru': 'Где ты находишься?',
         'kz': 'Men qazir ony sigemin!'
     },
 
     'ask_destination': {
-        'en': 'Where do you want to go?',
+        'us': 'Where do you want to go?',
         'ru': 'Куда хочешь пойти?',
         'kz': 'Men qazir ony sigemin!'
     },
 
     'ask_floor': {
-        'en': 'What floor do you want to go?',
+        'us': 'What floor do you want to go?',
         'ru': 'На какой этаж ты хочешь попасть?',
         'kz': 'Men qazir ony sigemin!'
     },
 
     'cancel': {
-        'en': 'Canceled',
+        'us': 'Canceled',
         'ru': 'Отменено',
         'kz': 'Men qazir ony sigemin!'
-    }
+    },
+
+    'ask_language': {
+        'us': 'Choose language',
+        'ru': 'Выбери язык',
+        'kz': 'Men qazir ony sigemin!'
+    },
+
+    'changed_language': {
+        'us': 'Language changed',
+        'ru': 'Язык изменен',
+        'kz': 'Men qazir ony sigemin!'
+    },
+
+    'ask_level': {
+        'us': 'Choose level of detailing path',
+        'ru': 'Выбери уровень детализации пути',
+        'kz': 'Men qazir ony sigemin!'
+    },
+
+    'changed_level': {
+        'us': 'Level of detailing path changed',
+        'ru': 'Уровень детализации пути изменен',
+        'kz': 'Men qazir ony sigemin!'
+    },
 }
 
 ERRORS = {
 
     'not_found': {
-        'en': 'Not found. Try again',
+        'us': 'Not found. Try again',
         'ru': 'Место не найдено. Попробуй еще',
         'kz': 'Men qazir ony sigemin!'
     },
 
     'invalid_floor': {
-        'en': 'Not valid floor',
+        'us': 'Not valid floor',
         'ru': 'Несуществующий этаж',
         'kz': 'Men qazir ony sigemin!'
     }
@@ -49,43 +73,43 @@ ERRORS = {
 MOVES = {
 
     'leave': {
-        'en': 'From {departure} turn {direction}',
+        'us': 'From {departure} turn {direction}',
         'ru': 'Выйди из {departure} и иди {direction}',
         'kz': 'Men qazir ony sigemin!'
     },
 
     'arrive': {
-        'en': '{arrive} will be on the {direction}',
+        'us': '{arrive} will be on the {direction}',
         'ru': 'Посмотри {direction}, там будет {arrive}',
         'kz': 'Men qazir ony sigemin!'
     },
 
     'up': {
-        'en': 'Go upstairs to {floor} floor and go {direction}',
+        'us': 'Go upstairs to {floor} floor and go {direction}',
         'ru': 'Поднимись по лестнице на {floor} этаж и иди {direction}',
         'kz': 'Men qazir ony sigemin!'
     },
 
     'down': {
-        'en': 'Go downstairs to {floor} floor and go {direction}',
+        'us': 'Go downstairs to {floor} floor and go {direction}',
         'ru': 'Спустись по лестнице на {floor} этаж и иди {direction}',
         'kz': ''
     },
 
     'left': {
-        'en': 'On the cross turn left',
+        'us': 'On the cross turn left',
         'ru': 'На повороте поверни налево',
         'kz': 'Men qazir ony sigemin!'
     },
 
     'right': {
-        'en': 'On the cross turn right',
+        'us': 'On the cross turn right',
         'ru': 'На повороте поверни направо',
         'kz': 'Men qazir ony sigemin!'
     },
 
     'straight': {
-        'en': 'On the cross go straight',
+        'us': 'On the cross go straight',
         'ru': 'Иди прямо мимо поворота',
         'kz': 'Men qazir ony sigemin!'
     }
@@ -94,19 +118,19 @@ MOVES = {
 DIRECTIONS = {
 
     'left': {
-        'en': 'left',
+        'us': 'left',
         'ru': 'налево',
         'kz': 'Men qazir ony sigemin!'
     },
 
     'right': {
-        'en': 'right',
+        'us': 'right',
         'ru': 'направо',
         'kz': 'Men qazir ony sigemin!'
     },
 
     'straight': {
-        'en': 'straight',
+        'us': 'straight',
         'ru': 'прямо',
         'kz': 'Men qazir ony sigemin!'
     }
@@ -115,37 +139,37 @@ DIRECTIONS = {
 FLOORS = {
 
     '0': {
-        'en': '',
+        'us': '',
         'ru': '-ой',
         'kz': 'Men qazir ony sigemin!'
     },
 
     '1': {
-        'en': 'st',
+        'us': 'st',
         'ru': '-ый',
         'kz': 'Men qazir ony sigemin!'
     },
 
     '2': {
-        'en': 'nd',
+        'us': 'nd',
         'ru': '-ой',
         'kz': 'Men qazir ony sigemin!'
     },
 
     '3': {
-        'en': 'rd',
+        'us': 'rd',
         'ru': '-ий',
         'kz': 'Men qazir ony sigemin!'
     },
 
     '4': {
-        'en': 'th',
+        'us': 'th',
         'ru': '-ый',
         'kz': 'Men qazir ony sigemin!'
     },
 
     '5': {
-        'en': 'th',
+        'us': 'th',
         'ru': '-ый',
         'kz': 'Men qazir ony sigemin!'
     }

@@ -67,25 +67,25 @@ class Database:
 
 		return level[0]
 
-	def update_user_language(self, user):
+	def update_user_language(self, telegram_id, language):
 		query = '''UPDATE users
 					SET language = ?
 					WHERE telegram_id = ?'''
 
 		with sqlite3.connect(self.path) as connection:
 			cursor = connection.cursor()
-			cursor.execute(query, user)
+			cursor.execute(query, (language, telegram_id))
 
 			connection.commit()
 
-	def update_user_level(self, user):
+	def update_user_level(self, telegram_id, level):
 		query = '''UPDATE users
 					SET level = ?
 					WHERE telegram_id = ?'''
 
 		with sqlite3.connect(self.path) as connection:
 			cursor = connection.cursor()
-			cursor.execute(query, user)
+			cursor.execute(query, (level, telegram_id))
 
 			connection.commit()
 
