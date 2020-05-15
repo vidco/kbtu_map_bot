@@ -3,13 +3,13 @@ import logging
 from telegram.ext import CommandHandler, MessageHandler, Filters, ConversationHandler
 
 from kbtu_map.db import Database
-from kbtu_map.graph import Graph
-from kbtu_map.settings import USERS_PATH, GRAPH_PATH, SIDE_DELTA
+from kbtu_map.graph import Map
+from kbtu_map.settings import SIDE_DELTA
 from kbtu_map.utils import ACTIONS, draw
 from kbtu_map.utils.iasync import send_photo
 
-USERS = Database(USERS_PATH)
-GRAPH = Graph(GRAPH_PATH)
+USERS = Database.get_instance()
+GRAPH = Map.get_instance()
 
 FLOOR_FROM, FLOOR_TO = range(2)
 

@@ -3,18 +3,18 @@ import logging
 from telegram.ext import CommandHandler, MessageHandler, Filters, ConversationHandler
 
 from kbtu_map.db import Database
-from kbtu_map.graph import Graph
-from kbtu_map.settings import USERS_PATH, GRAPH_PATH, SIDE_DELTA
+from kbtu_map.graph import Map
+from kbtu_map.settings import SIDE_DELTA
 from kbtu_map.utils import ACTIONS, draw, describe
 from kbtu_map.utils.iasync import send_photo
 from kbtu_map.utils.timer import timing_decorator
 
-USERS = Database(USERS_PATH)                             # Users database
-GRAPH = Graph(GRAPH_PATH)                                # Graph with node information
+USERS = Database.get_instance()
+GRAPH = Map.get_instance()
 
-PATH_FROM, PATH_TO = range(2)                                   # States of Conversation for path finding
+PATH_FROM, PATH_TO = range(2)
 
-LOG = logging.getLogger('path')                                 # Main logger
+LOG = logging.getLogger('path')
 
 
 def path_from(update, context):

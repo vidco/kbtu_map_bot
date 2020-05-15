@@ -2,16 +2,32 @@ import logging
 import os
 import sqlite3
 
+from kbtu_map.settings import USERS_PATH
+
 LOG = logging.getLogger('db')
 
 
 # noinspection SqlDialectInspection,SqlNoDataSourceInspection
 class Database:
+	__instance = None
+
+	@staticmethod
+	def get_instance():
+		if Database.__instance is None:
+			Database(USERS_PATH)
+
+		return Database.__instance
 
 	def __init__(self, path):
+		"""
+		Do not call constructor of this class, it is singleton
+		"""
+		if Database.__instance is not None:
+			raise Exception("This class is a singleton!")
+
 		self.path = path
 
-		LOG.info('Connected to database')
+		LOG.info(f'Connected to database ({id(self)})')
 
 		if not os.path.exists(path):
 			query = '''CREATE TABLE IF NOT EXISTS users (
@@ -28,6 +44,8 @@ class Database:
 				connection.commit()
 
 			LOG.info('Table users created')
+
+		Database.__instance = self
 
 	def create_user(self, user):
 		query = 'INSERT INTO users(telegram_id) VALUES(?)'

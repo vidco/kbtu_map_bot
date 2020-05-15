@@ -4,12 +4,9 @@ from telegram import ReplyKeyboardMarkup, ReplyKeyboardRemove
 from telegram.ext import CommandHandler, MessageHandler, Filters, ConversationHandler
 
 from kbtu_map.db import Database
-from kbtu_map.graph import Graph
-from kbtu_map.settings import USERS_PATH, GRAPH_PATH
 from kbtu_map.utils import ACTIONS
 
-USERS = Database(USERS_PATH)                             # Users database
-GRAPH = Graph(GRAPH_PATH)                                # Graph with node information
+USERS = Database.get_instance()
 
 FIRST = range(1)
 
