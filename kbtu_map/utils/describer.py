@@ -15,13 +15,13 @@ def describe(path, language, level):
         if path[i].isnumeric():
             if path[i + 1].isnumeric():
                 if level > 2:
-                    result += str(counter) + '. ' + 'Pass ' + path[i]
+                    result += str(counter) + '. ' + MOVES.get('pass').get(language) + path[i]
                 else:
                     i += 1
                     continue
             else:
                 if level > 1:
-                    result += str(counter) + '. ' + 'Pass ' + path[i]
+                    result += str(counter) + '. ' + MOVES.get('pass').get(language) + path[i]
                 else:
                     i += 1
                     continue
