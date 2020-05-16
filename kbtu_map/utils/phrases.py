@@ -3,55 +3,55 @@ ACTIONS = {
     'greetings': {
         'us': 'Hello! I can find fastest path to any place in KBTU!',
         'ru': 'Привет! Я могу найти кратчайший путь до любого места в КБТУ!',
-        'kz': 'Men qazir ony sigemin!'
+        'kz': 'Сәлем! Мен КБТУ-ның кез-келген жеріне ең қыска жолды тауып бере аламын!'
     },
 
     'ask_location': {
         'us': 'Where are you?',
         'ru': 'Где ты находишься?',
-        'kz': 'Men qazir ony sigemin!'
+        'kz': 'Сен қазір қай жердесін?'
     },
 
     'ask_destination': {
         'us': 'Where do you want to go?',
         'ru': 'Куда хочешь пойти?',
-        'kz': 'Men qazir ony sigemin!'
+        'kz': 'Қай жерге барғың келеді?'
     },
 
     'ask_floor': {
         'us': 'What floor do you want to go?',
         'ru': 'На какой этаж ты хочешь попасть?',
-        'kz': 'Men qazir ony sigemin!'
+        'kz': 'Қай қабатқа барғың келеді?'
     },
 
     'cancel': {
         'us': 'Canceled',
         'ru': 'Отменено',
-        'kz': 'Men qazir ony sigemin!'
+        'kz': 'Жою'             # Todo: Find proper translation
     },
 
     'ask_language': {
         'us': 'Choose language',
         'ru': 'Выбери язык',
-        'kz': 'Men qazir ony sigemin!'
+        'kz': 'Тілді таңдаңыз'
     },
 
     'changed_language': {
         'us': 'Language changed',
         'ru': 'Язык изменен',
-        'kz': 'Men qazir ony sigemin!'
+        'kz': 'Тіл өзгертілді'
     },
 
     'ask_level': {
         'us': 'Choose level of detailing path',
         'ru': 'Выбери уровень детализации пути',
-        'kz': 'Men qazir ony sigemin!'
+        'kz': 'Жолдың нақтылау деңгейін таңда'
     },
 
     'changed_level': {
         'us': 'Level of detailing path changed',
         'ru': 'Уровень детализации пути изменен',
-        'kz': 'Men qazir ony sigemin!'
+        'kz': 'Жолдың нақтылау деңгейі өзгертілді'
     },
 
     'help': {
@@ -81,7 +81,17 @@ ACTIONS = {
               'где 0 - это полное отсутствие описания, а 3 - это самое детальное описание. Экспериментируйте и '
               'выбирайте наиболее подходящий для вас уровень.\n'
               'По всем интересующим вопросам, а также с предложениями обращаться к @dontnicemebr0 или @thesafatem.',
-        'kz': ''
+        'kz': 'KBTUMap - бұл КБТУ-нің екі пункт арасындағы ең қолайлы бағытты көрсететін бот.\n'
+              'Қазір бот келесі міндеттерді атқарады:\n'
+              '/path - cен өзіннің қазіргі орнын және саған бару керек орнын жібересін. Бот саған ең қысқа бағытты '
+              'және оны сөздің сипаттамасымен бірге жібереді.\n'
+              '/floor - cен өзіннің қазіргі орнын және саған бару керек қабатын жібересін. Бот саған сол қабаттағы ең '
+              'жақын орнын және оны сөздің сипаттамасымен бірге жібереді.\n'
+              'Және де сен ботты өз қалауынша реттей аласын:\n'
+              '/language - ботпен байланыс тілін өзгерте аласын. Ағылшын, орыс немесе қазақ тілі.\n'
+              '/level - сөз сипаттамасының нақтылау деңгейін таңдай аласын. Деңгей 0-ден 3-ке дейін өзгереді. 0 - '
+              'ешқандай сипаттама жок, 3 - ең нақты сипаттама. Эксперимент жасап, өзіңізге ең қолайлы деңгейін таңда.\n'
+              'Егер сұрақтарыңыз немесе ұсыныстарыңыз болса, @dontnicemebr0 және @thesafatem хабарласыңыз.'
     }
 }
 
@@ -90,13 +100,13 @@ ERRORS = {
     'not_found': {
         'us': 'Not found. Try again',
         'ru': 'Место не найдено. Попробуй еще',
-        'kz': 'Men qazir ony sigemin!'
+        'kz': 'Ондай жер табылмады. Қайтадан істеп көріңіз'
     },
 
     'invalid_floor': {
         'us': 'Not valid floor',
         'ru': 'Несуществующий этаж',
-        'kz': 'Men qazir ony sigemin!'
+        'kz': 'Мұндай қабат жоқ'
     }
 }
 
@@ -105,49 +115,49 @@ MOVES = {
     'leave': {
         'us': 'From {departure} turn {direction}',
         'ru': 'Выйди из {departure} и иди {direction}',
-        'kz': 'Men qazir ony sigemin!'
+        'kz': '{departure} шығып, {direction} бар'
     },
 
     'arrive': {
         'us': '{arrive} will be on the {direction}',
         'ru': 'Посмотри {direction}, там будет {arrive}',
-        'kz': 'Men qazir ony sigemin!'
+        'kz': '{direction} қарасаң, {arrive} болады'
     },
 
     'pass': {
         'us': 'Pass',
         'ru': 'Пройди мимо',
-        'kz': 'Men qazir ony sigemin!'
+        'kz': 'Қасынан өт'
     },
 
     'up': {
         'us': 'Go upstairs to {floor} floor and go {direction}',
         'ru': 'Поднимись по лестнице на {floor} этаж и иди {direction}',
-        'kz': 'Men qazir ony sigemin!'
+        'kz': 'Баспалдақпен {floor} - қабатқа шығып, {direction} бар'
     },
 
     'down': {
         'us': 'Go downstairs to {floor} floor and go {direction}',
         'ru': 'Спустись по лестнице на {floor} этаж и иди {direction}',
-        'kz': 'Men qazir ony sigemin!'
+        'kz': 'Баспалдақпен {floor} қабатқа түсіп, {direction} бар'
     },
 
     'left': {
         'us': 'On the cross turn left',
         'ru': 'На повороте поверни налево',
-        'kz': 'Men qazir ony sigemin!'
+        'kz': 'Бұрылыста сол жаққа бар'
     },
 
     'right': {
         'us': 'On the cross turn right',
         'ru': 'На повороте поверни направо',
-        'kz': 'Men qazir ony sigemin!'
+        'kz': 'Бұрылыста оң жаққа бар'
     },
 
     'straight': {
         'us': 'On the cross go straight',
         'ru': 'Иди прямо мимо поворота',
-        'kz': 'Men qazir ony sigemin!'
+        'kz': 'Бұрылысты өтіп, тіке жүр'
     }
 }
 
@@ -156,19 +166,19 @@ DIRECTIONS = {
     'left': {
         'us': 'left',
         'ru': 'налево',
-        'kz': 'Men qazir ony sigemin!'
+        'kz': 'сол жаққа'
     },
 
     'right': {
         'us': 'right',
         'ru': 'направо',
-        'kz': 'Men qazir ony sigemin!'
+        'kz': 'оң жаққа'
     },
 
     'straight': {
         'us': 'straight',
         'ru': 'прямо',
-        'kz': 'Men qazir ony sigemin!'
+        'kz': 'тіке'
     }
 }
 
@@ -177,36 +187,36 @@ FLOORS = {
     '0': {
         'us': '',
         'ru': '-ой',
-        'kz': 'Men qazir ony sigemin!'
+        'kz': ''
     },
 
     '1': {
         'us': 'st',
         'ru': '-ый',
-        'kz': 'Men qazir ony sigemin!'
+        'kz': '-інші'
     },
 
     '2': {
         'us': 'nd',
         'ru': '-ой',
-        'kz': 'Men qazir ony sigemin!'
+        'kz': '-інші'
     },
 
     '3': {
         'us': 'rd',
         'ru': '-ий',
-        'kz': 'Men qazir ony sigemin!'
+        'kz': '-інші'
     },
 
     '4': {
         'us': 'th',
         'ru': '-ый',
-        'kz': 'Men qazir ony sigemin!'
+        'kz': '-інші'
     },
 
     '5': {
         'us': 'th',
         'ru': '-ый',
-        'kz': 'Men qazir ony sigemin!'
+        'kz': '-інші'
     }
 }
