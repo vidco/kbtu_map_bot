@@ -4,10 +4,11 @@ from telegram.ext import Updater, CommandHandler
 
 from kbtu_map.db import Database
 from kbtu_map.handlers import floor, path, language, level
-from kbtu_map.settings import USERS_PATH, TOKEN
+from kbtu_map.settings import TOKEN
 from kbtu_map.utils import ACTIONS
 
-USERS = Database(USERS_PATH)
+USERS = Database.get_instance()
+
 LOG = logging.getLogger('main')
 
 
@@ -22,6 +23,11 @@ def start(update, context):
     update.message.reply_text(ACTIONS.get('greetings').get(lang))
 
 
+def _help(update, context):
+    lang = USERS.select_language_by_telegram_id(update.message.from_user.id)
+    update.message.reply_text(ACTIONS.get('help').get(lang))
+
+
 def error(update, context):
     LOG.error(context.error)
 
@@ -32,6 +38,9 @@ def main():
 
     # Register /start command
     updater.dispatcher.add_handler(CommandHandler("start", start))
+
+    # Register /help command
+    updater.dispatcher.add_handler(CommandHandler("help", _help))
 
     # Register Conversation Handler with /path and /cancel commands
     updater.dispatcher.add_handler(path.as_handler())

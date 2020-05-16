@@ -55,29 +55,32 @@ ACTIONS = {
     },
 
     'help': {
-        'us': 'KBTUMap is a bot that builds and shows you the optimal path between two locations in KBTU.\n \
-                Currently bot maintains following functions:\n \
-                /path - you send your current location and destination. \
-                Bot shows you the shortest path which is followed by verbal description.\n \
-                /floor - you send your current location and destination floor. \
-                Bot shows you the path to the closest location on correspondent floor. \
-                The path is followed by verbal description.\n \
-                Also you can change settings as you wish. Send:\n \
-                /language - and you can choose bot language. English, russian or kazakh.\n \
-                /level - and you can choose detailing level of verbal description. Level varies from 0 to 3, \
-                where 0 is the lack of description and 3 is the most detailed description. Try out and choose the most appropriate for you.\n \
-                If you have any questions or proposals, contact @dontnicemebr0 or @thesafatem.',
-        'ru': 'KBTUMap - это бот, который позволяет построить оптимальный маршрут между двумя локациями в КБТУ.\n \
-                На данный момент бот поддерживает следующие функции:\n \
-                /path - ты отправляешь свое местоположение и место, в которое тебе нужно попасть. \
-                Бот показывает на карте самый короткий маршрут и сопровождает его словесным описанием.\n \
-                /floor - ты отправляешь свое местоположение и этаж, на который тебе нужно попасть. \
-                Бот показывает путь до ближайшей локации на соответсвующем этаже и сопровождает его словесным описанием.\n \
-                Также ты можешь настроить бота по своему желанию. Отправь:\n \
-                /language - и ты сможешь выбрать язык общения с ботом. Английский, русский или казахский.\n \
-                /level - и ты сможешь выбрать уровень детализации словесного описания. Уровень варьируется от 0 до 3, \
-                где 0 - это полное отсутствие описания, а 3 - это самое детальное описание. Экспериментируйте и выбирайте наиболее подходящий для вас уровень.\n \
-                По всем интересующим вопросам, а также с предложениями обращаться к @dontnicemebr0 или @thesafatem.',
+        'us': 'KBTUMap is a bot that builds and shows you the optimal path between two locations in KBTU.\n'
+              'Currently bot maintains following functions:\n'
+              '/path - you send your current location and destination.'
+              'Bot shows you the shortest path which is followed by verbal description.\n'
+              '/floor - you send your current location and destination floor.'
+              'Bot shows you the path to the closest location on correspondent floor.'
+              'The path is followed by verbal description.\n'
+              'Also you can change settings as you wish. Send:\n'
+              '/language - and you can choose bot language. English, russian or kazakh.\n'
+              '/level - and you can choose detailing level of verbal description. Level varies from 0 to 3,'
+              'where 0 is the lack of description and 3 is the most detailed description. '
+              'Try out and choose the most appropriate for you.\n'
+              'If you have any questions or proposals, contact @dontnicemebr0 or @thesafatem.',
+        'ru': 'KBTUMap - это бот, который позволяет построить оптимальный маршрут между двумя локациями в КБТУ.\n'
+              'На данный момент бот поддерживает следующие функции:\n'
+              '/path - ты отправляешь свое местоположение и место, в которое тебе нужно попасть.'
+              'Бот показывает на карте самый короткий маршрут и сопровождает его словесным описанием.\n'
+              '/floor - ты отправляешь свое местоположение и этаж, на который тебе нужно попасть.'
+              'Бот показывает путь до ближайшей локации на соответсвующем этаже и сопровождает его словесным '
+              'описанием.\n'
+              'Также ты можешь настроить бота по своему желанию. Отправь:\n'
+              '/language - и ты сможешь выбрать язык общения с ботом. Английский, русский или казахский.\n'
+              '/level - и ты сможешь выбрать уровень детализации словесного описания. Уровень варьируется от 0 до 3,'
+              'где 0 - это полное отсутствие описания, а 3 - это самое детальное описание. Экспериментируйте и '
+              'выбирайте наиболее подходящий для вас уровень.\n'
+              'По всем интересующим вопросам, а также с предложениями обращаться к @dontnicemebr0 или @thesafatem.',
         'kz': ''
     }
 }

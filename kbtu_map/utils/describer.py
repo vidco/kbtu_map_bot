@@ -50,19 +50,3 @@ def _describe_floor(change_floor, direction, language):
     up_or_down, floor = options[0], options[1]
     return MOVES.get(up_or_down).get(language).format(floor=floor + FLOORS.get(floor).get(language),
                                                       direction=DIRECTIONS.get(direction).get(language))
-
-
-OFFSET = 127462 - ord('A')
-
-
-def flag(code):
-    code = code.upper()
-    return chr(ord(code[0]) + OFFSET) + chr(ord(code[1]) + OFFSET)
-
-
-def unflag(qwe):
-    return (chr(ord(qwe[0]) - OFFSET) + chr(ord(qwe[1]) - OFFSET)).lower()
-
-
-def unflaggable(qwe):
-    return len(qwe) == 2 and ord(qwe[0]) - OFFSET > 0 and ord(qwe[1]) - OFFSET > 0
