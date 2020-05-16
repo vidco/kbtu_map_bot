@@ -102,6 +102,7 @@ struct Node {
 };
 
 struct Graph {
+public:
 
 	std::vector<Node> g;
 
@@ -140,6 +141,11 @@ struct Graph {
 			g.push_back(*node);
 		}
 	}
+
+	static Graph& getInstance(std::string path) {
+        static Graph instance { path };
+        return instance;
+    }
 
 	Node getNode(int id) {
 		for (int i = 0; i < int(g.size()); i++) {
@@ -373,6 +379,7 @@ struct Graph {
 };
 
 PYBIND11_MODULE(graph, m) {
+
     py::class_<Node>(m, "Node")
     	.def(py::init<int, std::string, int, int, int, std::string, std::vector<int> >())
     	.def("get_id", &Node::getId)
@@ -398,10 +405,11 @@ PYBIND11_MODULE(graph, m) {
     	.def("get_direction", &Graph::getDirection)
     	.def("get_cross", &Graph::getCross)
     	.def("path_description", &Graph::pathDescription)
-    	.def("get_stairs_direction", &Graph::getStairsDirection);
-    	
+    	.def("get_stairs_direction", &Graph::getStairsDirection)
+    	.def_static("get_instance", &Graph::getInstance, py::return_value_policy::reference);
+
     py::enum_<Direction>(m, "Direction")
-    	.value("UP", Direction::UP)
+        .value("UP", Direction::UP)
     	.value("DOWN", Direction::DOWN)
     	.value("LEFT", Direction::LEFT)
     	.value("RIGHT", Direction::RIGHT)
