@@ -1,6 +1,6 @@
 # KBTU map bot
 
-Bot created for finding fastest path to some location at KBTU
+Bot is created for finding fastest path to some location at KBTU
 
 ## About
 
