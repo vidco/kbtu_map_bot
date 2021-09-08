@@ -4,7 +4,7 @@ Bot is created for finding fastest path to some location at KBTU
 
 ## About
 
-Bot written on **python** with computation part on **c++**
+Bot is written on **python** with computation part on **c++**
 
 ## Details
 
